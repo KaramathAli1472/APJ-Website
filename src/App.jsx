@@ -28,7 +28,7 @@ import Contact from "./pages/Contact/Contact";
 import AdminLogin from "./pages/AdminLogin/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 
-import AdminApplications from "./pages/AdminApplications/AdminApplications";
+import AdminRegistrations from "./pages/AdminRegistrations/AdminRegistrations";
 import AdminSyllabus from "./pages/AdminSyllabus/AdminSyllabus";
 import AdminClasses from "./pages/AdminClasses/AdminClasses";
 import AdminGallery from "./pages/AdminGallery/AdminGallery";
@@ -58,7 +58,7 @@ function App() {
             element={<About />}
           />
 
-          {/* Admission */}
+          {/* Student Registration */}
           <Route
             path="/admission"
             element={<Admission />}
@@ -117,6 +117,8 @@ function App() {
             PROTECTED ADMIN PANEL
         ================================================== */}
 
+        {/* Dashboard */}
+
         <Route
           path="/admin/dashboard"
           element={
@@ -126,14 +128,20 @@ function App() {
           }
         />
 
+
+        {/* Student Registrations */}
+
         <Route
-          path="/admin/applications"
+          path="/admin/registrations"
           element={
             <ProtectedRoute>
-              <AdminApplications />
+              <AdminRegistrations />
             </ProtectedRoute>
           }
         />
+
+
+        {/* Syllabus */}
 
         <Route
           path="/admin/syllabus"
@@ -144,6 +152,9 @@ function App() {
           }
         />
 
+
+        {/* Classes */}
+
         <Route
           path="/admin/classes"
           element={
@@ -152,6 +163,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+
+        {/* Gallery */}
 
         <Route
           path="/admin/gallery"
@@ -162,6 +176,9 @@ function App() {
           }
         />
 
+
+        {/* Notices */}
+
         <Route
           path="/admin/notices"
           element={
@@ -170,6 +187,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+
+        {/* Settings */}
 
         <Route
           path="/admin/settings"

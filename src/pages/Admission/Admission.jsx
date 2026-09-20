@@ -1,28 +1,40 @@
 import { useState } from "react";
-import "./Admission.css";
-
 import {
-  addDoc,
   collection,
+  doc,
+  setDoc,
   serverTimestamp,
 } from "firebase/firestore";
 
 import { db } from "../../services/firestore/firestoreService";
+import cloudinaryConfig from "../../services/cloudinary/cloudinaryConfig";
+
+import "./Admission.css";
 
 function Admission() {
   const [formData, setFormData] = useState({
     studentName: "",
     fatherName: "",
-    className: "",
+    motherName: "",
+    gender: "",
+    dob: "",
     schoolName: "",
-    phone: "",
+    className: "",
+    medium: "",
     email: "",
-    message: "",
+    mobile: "",
+    whatsapp: "",
+    address: "",
+    studentPhoto: null,
+    transactionNumber: "",
   });
 
+  const [photoPreview, setPhotoPreview] = useState("");
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [registrationId, setRegistrationId] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -32,561 +44,1385 @@ function Admission() {
       [name]: value,
     }));
 
-    // Remove old messages when user starts editing again.
-    if (successMessage) {
-      setSuccessMessage("");
+    setErrors((previous) => ({
+      ...previous,
+      [name]: "",
+    }));
+
+    setSubmitted(false);
+    setSubmitError("");
+  };
+
+  const handlePhotoChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
     }
 
-    if (errorMessage) {
-      setErrorMessage("");
+    if (!file.type.startsWith("image/")) {
+      setErrors((previous) => ({
+        ...previous,
+        studentPhoto: "Please select a valid image.",
+      }));
+
+      return;
     }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors((previous) => ({
+        ...previous,
+        studentPhoto:
+          "Student photo must be less than 5 MB.",
+      }));
+
+      return;
+    }
+
+    setFormData((previous) => ({
+      ...previous,
+      studentPhoto: file,
+    }));
+
+    setPhotoPreview(URL.createObjectURL(file));
+
+    setErrors((previous) => ({
+      ...previous,
+      studentPhoto: "",
+    }));
+
+    setSubmitted(false);
+    setSubmitError("");
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.studentName.trim()) {
+      newErrors.studentName =
+        "Student name is required.";
+    }
+
+    if (!formData.fatherName.trim()) {
+      newErrors.fatherName =
+        "Father name is required.";
+    }
+
+    if (!formData.motherName.trim()) {
+      newErrors.motherName =
+        "Mother name is required.";
+    }
+
+    if (!formData.gender) {
+      newErrors.gender =
+        "Please select gender.";
+    }
+
+    if (!formData.dob) {
+      newErrors.dob =
+        "Date of birth is required.";
+    }
+
+    if (!formData.schoolName.trim()) {
+      newErrors.schoolName =
+        "School name is required.";
+    }
+
+    if (!formData.className) {
+      newErrors.className =
+        "Please select class.";
+    }
+
+    if (!formData.medium) {
+      newErrors.medium =
+        "Please select medium.";
+    }
+
+    if (
+      formData.email.trim() &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        formData.email
+      )
+    ) {
+      newErrors.email =
+        "Please enter a valid email address.";
+    }
+
+    if (!/^\d{10}$/.test(formData.mobile)) {
+      newErrors.mobile =
+        "Mobile number must contain 10 digits.";
+    }
+
+    if (!/^\d{10}$/.test(formData.whatsapp)) {
+      newErrors.whatsapp =
+        "WhatsApp number must contain 10 digits.";
+    }
+
+    if (!formData.address.trim()) {
+      newErrors.address =
+        "Address is required.";
+    }
+
+    if (!formData.studentPhoto) {
+      newErrors.studentPhoto =
+        "Student photo is required.";
+    }
+
+    if (!formData.transactionNumber.trim()) {
+      newErrors.transactionNumber =
+        "Transaction / UTR number is required.";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const uploadStudentPhoto = async (file) => {
+    if (
+      !cloudinaryConfig.cloudName ||
+      !cloudinaryConfig.uploadPreset
+    ) {
+      throw new Error(
+        "Cloudinary configuration is missing."
+      );
+    }
+
+    const uploadData = new FormData();
+
+    uploadData.append("file", file);
+
+    uploadData.append(
+      "upload_preset",
+      cloudinaryConfig.uploadPreset
+    );
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
+      {
+        method: "POST",
+        body: uploadData,
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.secure_url) {
+      throw new Error(
+        data?.error?.message ||
+          "Student photo upload failed."
+      );
+    }
+
+    return data.secure_url;
+  };
+
+  /*
+   * Create a unique student registration ID.
+   *
+   * Firestore generates a unique document ID first.
+   * That document ID is then used to create the
+   * student's Registration ID.
+   *
+   * Example:
+   * APJ-2026-AbCdEfGh123...
+   */
+  const createRegistrationId = (firestoreDocumentId) => {
+    const currentYear = new Date().getFullYear();
+
+    return `APJ-${currentYear}-${firestoreDocumentId.toUpperCase()}`;
+  };
+
+  const resetForm = () => {
+    setFormData({
+      studentName: "",
+      fatherName: "",
+      motherName: "",
+      gender: "",
+      dob: "",
+      schoolName: "",
+      className: "",
+      medium: "",
+      email: "",
+      mobile: "",
+      whatsapp: "",
+      address: "",
+      studentPhoto: null,
+      transactionNumber: "",
+    });
+
+    setPhotoPreview("");
+    setErrors({});
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setSuccessMessage("");
-    setErrorMessage("");
+    setSubmitted(false);
+    setSubmitError("");
+    setRegistrationId("");
 
-    const studentName = formData.studentName.trim();
-    const fatherName = formData.fatherName.trim();
-    const schoolName = formData.schoolName.trim();
-    const phone = formData.phone.trim();
-    const email = formData.email.trim();
-    const message = formData.message.trim();
+    const isValid = validateForm();
 
-    // Required field validation
-    if (
-      !studentName ||
-      !fatherName ||
-      !formData.className ||
-      !phone
-    ) {
-      setErrorMessage(
-        "Please fill in all required fields."
-      );
+    if (!isValid) {
       return;
     }
 
-    // Phone validation
-    const cleanPhone = phone.replace(/\D/g, "");
-
-    if (cleanPhone.length !== 10) {
-      setErrorMessage(
-        "Please enter a valid 10-digit phone number."
-      );
-      return;
-    }
-
-    // Email validation only when entered
-    if (
-      email &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ) {
-      setErrorMessage(
-        "Please enter a valid email address."
-      );
-      return;
-    }
+    setLoading(true);
 
     try {
-      setLoading(true);
+      /*
+       * STEP 1
+       * Upload student photo to Cloudinary.
+       */
 
-      await addDoc(collection(db, "applications"), {
-        // Student details
-        studentName: studentName,
-        name: studentName,
+      const studentPhotoUrl =
+        await uploadStudentPhoto(
+          formData.studentPhoto
+        );
 
-        // Parent details
-        fatherName: fatherName,
+      /*
+       * STEP 2
+       * Create a new Firestore document reference.
+       *
+       * Firestore generates a unique document ID
+       * before the document is actually saved.
+       */
 
-        // Academic details
-        className: formData.className,
-        class: `Class ${formData.className}`,
-
-        schoolName: schoolName,
-        school: schoolName,
-
-        // Contact details
-        phone: cleanPhone,
-        whatsapp: cleanPhone,
-        email: email,
-
-        // Enquiry
-        message: message,
-
-        // Admin status
-        status: "Pending",
-
-        // Firebase server timestamp
-        createdAt: serverTimestamp(),
-      });
-
-      setSuccessMessage(
-        "Your admission enquiry has been submitted successfully. Our administration team will contact you soon."
+      const registrationRef = doc(
+        collection(db, "registrations")
       );
 
-      // Clear form after successful submission
-      setFormData({
-        studentName: "",
-        fatherName: "",
-        className: "",
-        schoolName: "",
-        phone: "",
-        email: "",
-        message: "",
+      /*
+       * STEP 3
+       * Create the student's unique Registration ID
+       * using the unique Firestore document ID.
+       */
+
+      const generatedRegistrationId =
+        createRegistrationId(
+          registrationRef.id
+        );
+
+      /*
+       * STEP 4
+       * Prepare registration data.
+       */
+
+      const registrationData = {
+        registrationId:
+          generatedRegistrationId,
+
+        studentName:
+          formData.studentName.trim(),
+
+        fatherName:
+          formData.fatherName.trim(),
+
+        motherName:
+          formData.motherName.trim(),
+
+        gender:
+          formData.gender,
+
+        dob:
+          formData.dob,
+
+        schoolName:
+          formData.schoolName.trim(),
+
+        className:
+          formData.className,
+
+        medium:
+          formData.medium,
+
+        email:
+          formData.email.trim(),
+
+        mobile:
+          formData.mobile.trim(),
+
+        whatsapp:
+          formData.whatsapp.trim(),
+
+        address:
+          formData.address.trim(),
+
+        studentPhotoUrl:
+          studentPhotoUrl,
+
+        transactionNumber:
+          formData.transactionNumber.trim(),
+
+        registrationFee:
+          200,
+
+        /*
+         * Payment is not automatically verified.
+         * Admin will verify it manually.
+         */
+
+        paymentStatus:
+          "Pending",
+
+        /*
+         * Registration approval is also pending
+         * until admin checks the details.
+         */
+
+        approvalStatus:
+          "Pending",
+
+        /*
+         * ID card will NOT be generated at submission.
+         */
+
+        idCardStatus:
+          "Not Generated",
+
+        idCardUrl:
+          "",
+
+        createdAt:
+          serverTimestamp(),
+
+        updatedAt:
+          serverTimestamp(),
+      };
+
+      /*
+       * STEP 5
+       * Save the registration using the generated
+       * Firestore document reference.
+       */
+
+      await setDoc(
+        registrationRef,
+        registrationData
+      );
+
+      /*
+       * STEP 6
+       * Registration successfully saved.
+       */
+
+      setRegistrationId(
+        generatedRegistrationId
+      );
+
+      setSubmitted(true);
+
+      resetForm();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
       });
+
     } catch (error) {
       console.error(
-        "Admission enquiry submission error:",
+        "Registration submission error:",
         error
       );
 
-      setErrorMessage(
-        "Unable to submit your enquiry right now. Please try again."
+      setSubmitError(
+        error?.message ||
+          "Unable to submit registration. Please try again."
       );
+
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="admission-page">
+    <div className="registration-page">
 
-      {/* Hero */}
-      <section className="admission-hero">
-        <div className="admission-container">
-          <span className="admission-hero-label">
-            ADMISSIONS
+      {/* HERO */}
+
+      <section className="registration-hero">
+
+        <div className="registration-container">
+
+          <span className="registration-label">
+            APJ EDU
           </span>
 
           <h1>
-            Start Your
-            <span> Educational Journey</span>
+            Student Registration
           </h1>
 
           <p>
-            Explore the admission process and submit your
-            enquiry to APJ EDU.
+            Register your student details with
+            APJ Abdul Kalam Welfare Society.
           </p>
+
         </div>
+
       </section>
 
-      {/* Process */}
-      <section className="admission-process">
-        <div className="admission-container">
+      {/* FORM SECTION */}
 
-          <div className="admission-heading">
-            <span className="admission-section-label">
-              HOW IT WORKS
+      <section className="registration-section">
+
+        <div className="registration-container">
+
+          <div className="registration-heading">
+
+            <span>
+              REGISTRATION FORM
             </span>
 
             <h2>
-              Simple Admission Process
+              Student Registration Form
             </h2>
 
             <p>
-              Follow these simple steps to begin your
-              admission journey.
-            </p>
-          </div>
-
-          <div className="admission-steps">
-
-            <div className="admission-step">
-              <div className="step-number">01</div>
-
-              <div className="step-icon">📝</div>
-
-              <h3>
-                Submit Enquiry
-              </h3>
-
-              <p>
-                Fill in the admission enquiry form with
-                the student's basic information.
-              </p>
-            </div>
-
-            <div className="admission-step">
-              <div className="step-number">02</div>
-
-              <div className="step-icon">📞</div>
-
-              <h3>
-                Get Information
-              </h3>
-
-              <p>
-                Our team can provide the required
-                admission information and guidance.
-              </p>
-            </div>
-
-            <div className="admission-step">
-              <div className="step-number">03</div>
-
-              <div className="step-icon">🎓</div>
-
-              <h3>
-                Begin Learning
-              </h3>
-
-              <p>
-                Complete the required process and
-                begin your educational journey.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Application */}
-      <section className="admission-application">
-        <div className="admission-container admission-application-grid">
-
-          <div className="admission-info">
-
-            <span className="admission-section-label">
-              ADMISSION ENQUIRY
-            </span>
-
-            <h2>
-              Tell Us About the Student
-            </h2>
-
-            <p>
-              Submit your details through the form. The
-              information can be used by the administration
-              team to respond to your admission enquiry.
+              Please enter the student's information
+              carefully. All required fields must be
+              completed before submission.
             </p>
 
-            <div className="admission-info-list">
-
-              <div className="admission-info-item">
-                <span>✓</span>
-
-                <div>
-                  <strong>
-                    Student Information
-                  </strong>
-
-                  <p>
-                    Provide the student's basic details.
-                  </p>
-                </div>
-              </div>
-
-              <div className="admission-info-item">
-                <span>✓</span>
-
-                <div>
-                  <strong>
-                    Academic Details
-                  </strong>
-
-                  <p>
-                    Select the class and provide school
-                    information.
-                  </p>
-                </div>
-              </div>
-
-              <div className="admission-info-item">
-                <span>✓</span>
-
-                <div>
-                  <strong>
-                    Contact Details
-                  </strong>
-
-                  <p>
-                    Provide a phone number or email for
-                    communication.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-
           </div>
 
-          <div className="admission-form-card">
+          {/* SUCCESS MESSAGE */}
 
-            <div className="admission-form-header">
+          {submitted && (
+            <div className="registration-success">
+
+              <strong>
+                Registration Submitted Successfully
+              </strong>
+
               <span>
-                APPLICATION FORM
+                Your registration has been received
+                and is currently pending payment
+                verification.
               </span>
 
-              <h3>
-                Admission Enquiry
-              </h3>
+              {registrationId && (
+                <div
+                  style={{
+                    marginTop: "16px",
+                    padding: "18px",
+                    borderRadius: "12px",
+                    background: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                  }}
+                >
+
+                  <div
+                    style={{
+                      marginBottom: "8px",
+                      color: "#166534",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      letterSpacing: "0.8px",
+                    }}
+                  >
+                    YOUR REGISTRATION ID
+                  </div>
+
+                  <div
+                    style={{
+                      color: "#0f2747",
+                      fontSize: "22px",
+                      fontWeight: "800",
+                      letterSpacing: "1px",
+                      wordBreak: "break-all",
+                    }}
+                  >
+                    {registrationId}
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: "10px",
+                      color: "#526174",
+                      fontSize: "13px",
+                      lineHeight: "1.6",
+                    }}
+                  >
+                    Please save this Registration ID.
+                    You will need it to check your
+                    registration status and download
+                    your Student ID Card after approval.
+                  </div>
+
+                </div>
+              )}
+
+              <span
+                style={{
+                  marginTop: "12px",
+                }}
+              >
+                Your Student ID Card will be generated
+                only after your payment and registration
+                details are verified and approved by
+                the administration.
+              </span>
+
+            </div>
+          )}
+
+          {/* ERROR MESSAGE */}
+
+          {submitError && (
+            <div
+              style={{
+                marginBottom: "24px",
+                padding: "16px 18px",
+                borderRadius: "12px",
+                background: "#fff1f2",
+                border: "1px solid #fecdd3",
+                color: "#be123c",
+                fontSize: "14px",
+                lineHeight: "1.6",
+              }}
+            >
+
+              <strong>
+                Registration could not be submitted.
+              </strong>
+
+              <div>
+                {submitError}
+              </div>
+
+            </div>
+          )}
+
+          <form
+            className="registration-form"
+            onSubmit={handleSubmit}
+            noValidate
+          >
+
+            {/* 01 */}
+
+            <div className="form-section-title">
+
+              <span>
+                01
+              </span>
+
+              <div>
+
+                <h3>
+                  Student Information
+                </h3>
+
+                <p>
+                  Enter the student's basic details.
+                </p>
+
+              </div>
+
             </div>
 
-            {/* Success Message */}
-            {successMessage && (
-              <div
-                style={{
-                  marginBottom: "20px",
-                  padding: "14px 16px",
-                  borderRadius: "10px",
-                  background: "#ecfdf3",
-                  color: "#166534",
-                  border: "1px solid #bbf7d0",
-                  fontSize: "14px",
-                  lineHeight: "1.6",
-                }}
-              >
-                ✓ {successMessage}
-              </div>
-            )}
+            <div className="form-grid">
 
-            {/* Error Message */}
-            {errorMessage && (
-              <div
-                style={{
-                  marginBottom: "20px",
-                  padding: "14px 16px",
-                  borderRadius: "10px",
-                  background: "#fef2f2",
-                  color: "#b91c1c",
-                  border: "1px solid #fecaca",
-                  fontSize: "14px",
-                  lineHeight: "1.6",
-                }}
-              >
-                ⚠ {errorMessage}
-              </div>
-            )}
+              <div className="form-group">
 
-            <form onSubmit={handleSubmit}>
+                <label htmlFor="studentName">
+                  Student Name
+                  <span>*</span>
+                </label>
 
-              <div className="admission-form-row">
+                <input
+                  id="studentName"
+                  type="text"
+                  name="studentName"
+                  value={formData.studentName}
+                  onChange={handleChange}
+                  placeholder="Enter student name"
+                />
 
-                <div className="admission-form-group">
-                  <label htmlFor="studentName">
-                    Student Name
-                  </label>
-
-                  <input
-                    id="studentName"
-                    name="studentName"
-                    type="text"
-                    placeholder="Enter student name"
-                    value={formData.studentName}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="admission-form-group">
-                  <label htmlFor="fatherName">
-                    Father's Name
-                  </label>
-
-                  <input
-                    id="fatherName"
-                    name="fatherName"
-                    type="text"
-                    placeholder="Enter father's name"
-                    value={formData.fatherName}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                  />
-                </div>
+                {errors.studentName && (
+                  <small>
+                    {errors.studentName}
+                  </small>
+                )}
 
               </div>
 
-              <div className="admission-form-row">
+              <div className="form-group">
 
-                <div className="admission-form-group">
-                  <label htmlFor="className">
-                    Class
-                  </label>
+                <label htmlFor="fatherName">
+                  Father Name
+                  <span>*</span>
+                </label>
 
-                  <select
-                    id="className"
-                    name="className"
-                    value={formData.className}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                  >
-                    <option value="">
-                      Select class
-                    </option>
+                <input
+                  id="fatherName"
+                  type="text"
+                  name="fatherName"
+                  value={formData.fatherName}
+                  onChange={handleChange}
+                  placeholder="Enter father name"
+                />
 
-                    <option value="4">
-                      Class 4
-                    </option>
-
-                    <option value="5">
-                      Class 5
-                    </option>
-
-                    <option value="6">
-                      Class 6
-                    </option>
-
-                    <option value="7">
-                      Class 7
-                    </option>
-
-                    <option value="8">
-                      Class 8
-                    </option>
-
-                    <option value="9">
-                      Class 9
-                    </option>
-
-                    <option value="10">
-                      Class 10
-                    </option>
-
-                    <option value="Intermediate">
-                      Intermediate
-                    </option>
-                  </select>
-                </div>
-
-                <div className="admission-form-group">
-                  <label htmlFor="schoolName">
-                    School Name
-                  </label>
-
-                  <input
-                    id="schoolName"
-                    name="schoolName"
-                    type="text"
-                    placeholder="Enter school name"
-                    value={formData.schoolName}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                </div>
+                {errors.fatherName && (
+                  <small>
+                    {errors.fatherName}
+                  </small>
+                )}
 
               </div>
 
-              <div className="admission-form-row">
+              <div className="form-group">
 
-                <div className="admission-form-group">
-                  <label htmlFor="phone">
-                    Phone Number
-                  </label>
+                <label htmlFor="motherName">
+                  Mother Name
+                  <span>*</span>
+                </label>
 
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    inputMode="numeric"
-                    maxLength="10"
-                    placeholder="Enter 10-digit phone number"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                  />
-                </div>
+                <input
+                  id="motherName"
+                  type="text"
+                  name="motherName"
+                  value={formData.motherName}
+                  onChange={handleChange}
+                  placeholder="Enter mother name"
+                />
 
-                <div className="admission-form-group">
-                  <label htmlFor="email">
-                    Email Address
-                  </label>
-
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter email address"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                </div>
+                {errors.motherName && (
+                  <small>
+                    {errors.motherName}
+                  </small>
+                )}
 
               </div>
 
-              <div className="admission-form-group">
-                <label htmlFor="message">
-                  Message
+              <div className="form-group">
+
+                <label htmlFor="gender">
+                  Gender
+                  <span>*</span>
+                </label>
+
+                <select
+                  id="gender"
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                >
+
+                  <option value="">
+                    Select gender
+                  </option>
+
+                  <option value="Male">
+                    Male
+                  </option>
+
+                  <option value="Female">
+                    Female
+                  </option>
+
+                  <option value="Other">
+                    Other
+                  </option>
+
+                </select>
+
+                {errors.gender && (
+                  <small>
+                    {errors.gender}
+                  </small>
+                )}
+
+              </div>
+
+              <div className="form-group">
+
+                <label htmlFor="dob">
+                  D.O.B
+                  <span>*</span>
+                </label>
+
+                <input
+                  id="dob"
+                  type="date"
+                  name="dob"
+                  value={formData.dob}
+                  onChange={handleChange}
+                />
+
+                {errors.dob && (
+                  <small>
+                    {errors.dob}
+                  </small>
+                )}
+
+              </div>
+
+            </div>
+
+            {/* 02 */}
+
+            <div className="form-section-title">
+
+              <span>
+                02
+              </span>
+
+              <div>
+
+                <h3>
+                  School & Academic Details
+                </h3>
+
+                <p>
+                  Enter the student's current
+                  educational information.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div className="form-grid">
+
+              <div className="form-group form-full">
+
+                <label htmlFor="schoolName">
+                  School Name
+                  <span>*</span>
+                </label>
+
+                <input
+                  id="schoolName"
+                  type="text"
+                  name="schoolName"
+                  value={formData.schoolName}
+                  onChange={handleChange}
+                  placeholder="Enter school name"
+                />
+
+                {errors.schoolName && (
+                  <small>
+                    {errors.schoolName}
+                  </small>
+                )}
+
+              </div>
+
+              <div className="form-group">
+
+                <label htmlFor="className">
+                  Class
+                  <span>*</span>
+                </label>
+
+                <select
+                  id="className"
+                  name="className"
+                  value={formData.className}
+                  onChange={handleChange}
+                >
+
+                  <option value="">
+                    Select class
+                  </option>
+
+                  <option value="Class 4">
+                    Class 4
+                  </option>
+
+                  <option value="Class 5">
+                    Class 5
+                  </option>
+
+                  <option value="Class 6">
+                    Class 6
+                  </option>
+
+                  <option value="Class 7">
+                    Class 7
+                  </option>
+
+                  <option value="Class 8">
+                    Class 8
+                  </option>
+
+                  <option value="Class 9">
+                    Class 9
+                  </option>
+
+                  <option value="Class 10">
+                    Class 10
+                  </option>
+
+                  <option value="Intermediate">
+                    Intermediate
+                  </option>
+
+                </select>
+
+                {errors.className && (
+                  <small>
+                    {errors.className}
+                  </small>
+                )}
+
+              </div>
+
+              <div className="form-group">
+
+                <label htmlFor="medium">
+                  Medium
+                  <span>*</span>
+                </label>
+
+                <select
+                  id="medium"
+                  name="medium"
+                  value={formData.medium}
+                  onChange={handleChange}
+                >
+
+                  <option value="">
+                    Select medium
+                  </option>
+
+                  <option value="English">
+                    English
+                  </option>
+
+                  <option value="Telugu">
+                    Telugu
+                  </option>
+
+                  <option value="Urdu">
+                    Urdu
+                  </option>
+
+                </select>
+
+                {errors.medium && (
+                  <small>
+                    {errors.medium}
+                  </small>
+                )}
+
+              </div>
+
+            </div>
+
+            {/* 03 */}
+
+            <div className="form-section-title">
+
+              <span>
+                03
+              </span>
+
+              <div>
+
+                <h3>
+                  Contact Information
+                </h3>
+
+                <p>
+                  Provide valid contact details.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div className="form-grid">
+
+              <div className="form-group">
+
+                <label htmlFor="email">
+
+                  Email
+
+                  <span className="optional">
+                    Optional
+                  </span>
+
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter email address"
+                />
+
+                {errors.email && (
+                  <small>
+                    {errors.email}
+                  </small>
+                )}
+
+              </div>
+
+              <div className="form-group">
+
+                <label htmlFor="mobile">
+                  Mobile Number
+                  <span>*</span>
+                </label>
+
+                <input
+                  id="mobile"
+                  type="tel"
+                  name="mobile"
+                  inputMode="numeric"
+                  maxLength="10"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  placeholder="10 digit mobile number"
+                />
+
+                {errors.mobile && (
+                  <small>
+                    {errors.mobile}
+                  </small>
+                )}
+
+              </div>
+
+              <div className="form-group">
+
+                <label htmlFor="whatsapp">
+                  WhatsApp Number
+                  <span>*</span>
+                </label>
+
+                <input
+                  id="whatsapp"
+                  type="tel"
+                  name="whatsapp"
+                  inputMode="numeric"
+                  maxLength="10"
+                  value={formData.whatsapp}
+                  onChange={handleChange}
+                  placeholder="10 digit WhatsApp number"
+                />
+
+                {errors.whatsapp && (
+                  <small>
+                    {errors.whatsapp}
+                  </small>
+                )}
+
+              </div>
+
+              <div className="form-group form-full">
+
+                <label htmlFor="address">
+                  Address
+                  <span>*</span>
                 </label>
 
                 <textarea
-                  id="message"
-                  name="message"
-                  placeholder="Write your enquiry..."
-                  value={formData.message}
+                  id="address"
+                  name="address"
+                  value={formData.address}
                   onChange={handleChange}
+                  placeholder="Enter complete address"
                   rows="4"
-                  disabled={loading}
-                ></textarea>
+                />
+
+                {errors.address && (
+                  <small>
+                    {errors.address}
+                  </small>
+                )}
+
               </div>
+
+            </div>
+
+            {/* 04 */}
+
+            <div className="form-section-title">
+
+              <span>
+                04
+              </span>
+
+              <div>
+
+                <h3>
+                  Student Photo
+                </h3>
+
+                <p>
+                  Upload a clear recent photograph.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div className="photo-upload-area">
+
+              <div className="photo-preview">
+
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Student preview"
+                  />
+                ) : (
+                  <div className="photo-placeholder">
+
+                    <span>
+                      📷
+                    </span>
+
+                    <p>
+                      Student Photo
+                    </p>
+
+                  </div>
+                )}
+
+              </div>
+
+              <div className="photo-upload-content">
+
+                <label
+                  htmlFor="studentPhoto"
+                  className="upload-button"
+                >
+                  Choose Photo
+                </label>
+
+                <input
+                  id="studentPhoto"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                />
+
+                <p>
+                  JPG, JPEG or PNG • Maximum 5 MB
+                </p>
+
+                {errors.studentPhoto && (
+                  <small>
+                    {errors.studentPhoto}
+                  </small>
+                )}
+
+              </div>
+
+            </div>
+
+            {/* 05 */}
+
+            <div className="form-section-title">
+
+              <span>
+                05
+              </span>
+
+              <div>
+
+                <h3>
+                  Registration Payment
+                </h3>
+
+                <p>
+                  Complete the registration payment
+                  before submitting your application.
+                </p>
+
+              </div>
+
+            </div>
+
+            {/* PAYMENT CARD */}
+
+            <div className="payment-card">
+
+              <div className="payment-card-top">
+
+                <div className="payment-card-title">
+
+                  <div className="payment-icon">
+                    ₹
+                  </div>
+
+                  <div>
+
+                    <span>
+                      REGISTRATION FEE
+                    </span>
+
+                    <h3>
+                      Payment Information
+                    </h3>
+
+                  </div>
+
+                </div>
+
+                <div className="payment-amount">
+                  ₹200
+                </div>
+
+              </div>
+
+              <div className="payment-card-body">
+
+                <p className="payment-description">
+
+                  Please complete the registration
+                  payment of
+                  <strong> ₹200 </strong>
+                  using the bank details provided
+                  below. After making the payment,
+                  enter your transaction or UTR
+                  number in the form.
+
+                </p>
+
+                {/* BANK DETAILS */}
+
+                <div className="bank-details">
+
+                  <div className="bank-details-heading">
+                    Bank Transfer Details
+                  </div>
+
+                  <div className="bank-detail-row">
+
+                    <span>
+                      Bank Name
+                    </span>
+
+                    <strong>
+                      Canara Bank
+                    </strong>
+
+                  </div>
+
+                  <div className="bank-detail-row">
+
+                    <span>
+                      Branch
+                    </span>
+
+                    <strong>
+                      Kanchanbagh Branch
+                    </strong>
+
+                  </div>
+
+                  <div className="bank-detail-row">
+
+                    <span>
+                      Account Number
+                    </span>
+
+                    <strong className="account-number">
+                      1849201000767
+                    </strong>
+
+                  </div>
+
+                  <div className="bank-detail-row">
+
+                    <span>
+                      IFSC Code
+                    </span>
+
+                    <strong>
+                      CNRB0001849
+                    </strong>
+
+                  </div>
+
+                </div>
+
+                {/* PAYMENT STEPS */}
+
+                <div className="payment-steps">
+
+                  <div className="payment-step">
+
+                    <div className="step-number">
+                      01
+                    </div>
+
+                    <div>
+
+                      <h4>
+                        Make Payment
+                      </h4>
+
+                      <p>
+                        Transfer ₹200 to the bank
+                        account mentioned above.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                  <div className="payment-step">
+
+                    <div className="step-number">
+                      02
+                    </div>
+
+                    <div>
+
+                      <h4>
+                        Enter Transaction Number
+                      </h4>
+
+                      <p>
+                        Enter the transaction or UTR
+                        number shown on your receipt.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                  <div className="payment-step">
+
+                    <div className="step-number">
+                      03
+                    </div>
+
+                    <div>
+
+                      <h4>
+                        Payment Verification
+                      </h4>
+
+                      <p>
+                        Our administration will verify
+                        your payment before approval.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* IMPORTANT INFORMATION */}
+
+            <div className="payment-important">
+
+              <div className="payment-important-icon">
+                ✓
+              </div>
+
+              <div>
+
+                <h4>
+                  Important Information
+                </h4>
+
+                <p>
+                  Your registration will remain under
+                  <strong>
+                    {" "}Pending Verification{" "}
+                  </strong>
+                  until the payment has been verified
+                  by the administration.
+                </p>
+
+                <p>
+                  Once your payment and registration
+                  details are successfully verified
+                  and approved, your
+                  <strong>
+                    {" "}Student ID Card will be
+                    generated{" "}
+                  </strong>
+                  and made available for download.
+                </p>
+
+              </div>
+
+            </div>
+
+            {/* TRANSACTION */}
+
+            <div className="form-group payment-transaction-field">
+
+              <label htmlFor="transactionNumber">
+
+                Transaction / UTR Number
+
+                <span>*</span>
+
+              </label>
+
+              <input
+                id="transactionNumber"
+                type="text"
+                name="transactionNumber"
+                value={
+                  formData.transactionNumber
+                }
+                onChange={handleChange}
+                placeholder="Enter your transaction / UTR number"
+              />
+
+              {errors.transactionNumber && (
+                <small>
+                  {errors.transactionNumber}
+                </small>
+              )}
+
+              <p className="field-help">
+                Please enter the transaction number
+                exactly as shown in your bank or
+                payment receipt.
+              </p>
+
+            </div>
+
+            {/* SUBMIT */}
+
+            <div className="registration-submit">
+
+              <p>
+                By submitting this form, you confirm
+                that the information provided is
+                correct and that the payment details
+                entered by you are genuine.
+              </p>
 
               <button
                 type="submit"
-                className="admission-submit-button"
                 disabled={loading}
-                style={{
-                  opacity: loading ? 0.7 : 1,
-                  cursor: loading
-                    ? "not-allowed"
-                    : "pointer",
-                }}
               >
+
                 {loading
-                  ? "Submitting..."
-                  : "Submit Enquiry →"}
+                  ? "Submitting Registration..."
+                  : "Submit Registration →"}
+
               </button>
 
-            </form>
+            </div>
 
-          </div>
-
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
-      <section className="admission-bottom">
-        <div className="admission-container">
-
-          <div>
-            <span>
-              NEED MORE INFORMATION?
-            </span>
-
-            <h2>
-              Have Questions About Admission?
-            </h2>
-
-            <p>
-              Visit our FAQ or contact us for more
-              information.
-            </p>
-          </div>
-
-          <div className="admission-bottom-buttons">
-
-            <a
-              href="tel:+918500212306"
-              className="admission-call-button"
-            >
-              Call Us
-            </a>
-
-            <a
-              href="mailto:apjedu2001@gmail.com"
-              className="admission-email-button"
-            >
-              Email Us
-            </a>
-
-          </div>
+          </form>
 
         </div>
+
       </section>
 
     </div>

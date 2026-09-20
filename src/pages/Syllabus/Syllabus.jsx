@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+
 import {
   collection,
-  onSnapshot,
+  getDocs,
   orderBy,
   query,
+  where,
 } from "firebase/firestore";
 
 import "./Syllabus.css";
@@ -12,127 +14,139 @@ import "./Syllabus.css";
 import { db } from "../../services/firestore/firestoreService";
 
 function Syllabus() {
-  const [syllabusData, setSyllabusData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [syllabusData, setSyllabusData] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [errorMessage, setErrorMessage] =
+    useState("");
 
   useEffect(() => {
-    const syllabusQuery = query(
-      collection(db, "syllabus"),
-      orderBy("createdAt", "desc")
-    );
+    const loadSyllabus = async () => {
+      try {
+        setLoading(true);
+        setErrorMessage("");
 
-    const unsubscribe = onSnapshot(
-      syllabusQuery,
-      (snapshot) => {
+        /*
+         * Firebase se sirf Published syllabus
+         * records fetch kiye ja rahe hain.
+         */
+        const syllabusQuery = query(
+          collection(db, "syllabus"),
+          where("status", "==", "Published"),
+          orderBy("createdAt", "desc")
+        );
+
+        const snapshot =
+          await getDocs(syllabusQuery);
+
         const data = snapshot.docs.map((item) => ({
           id: item.id,
           ...item.data(),
         }));
 
         setSyllabusData(data);
-        setLoading(false);
-        setErrorMessage("");
-      },
-      (error) => {
+      } catch (error) {
         console.error(
           "Syllabus loading error:",
           error
         );
 
+        /*
+         * Agar composite index ki zarurat ho,
+         * Firebase console ka error yahan console
+         * mein clearly show hoga.
+         */
         setErrorMessage(
           "Unable to load syllabus information right now."
         );
 
+        setSyllabusData([]);
+      } finally {
         setLoading(false);
       }
-    );
+    };
 
-    return () => unsubscribe();
+    loadSyllabus();
   }, []);
 
   /*
-   * Group Firestore syllabus documents by class.
-   *
-   * Example:
-   *
-   * Class 4
-   *   Mathematics
-   *   Science
-   *   English
-   *
-   * Only Published syllabus items are shown
-   * on the public website.
+   * Group syllabus documents by class.
    */
-  const groupedClasses = syllabusData
-    .filter((item) => {
-      return (
-        !item.status ||
-        item.status.toLowerCase() === "published"
-      );
-    })
-    .reduce((groups, item) => {
-      const className =
-        item.className || item.class || "";
+  const groupedClasses =
+    syllabusData.reduce(
+      (groups, item) => {
+        const className =
+          item.className ||
+          item.class ||
+          "";
 
-      const subject =
-        item.subject || "";
+        const subject =
+          item.subject ||
+          "";
 
-      if (!className) {
+        if (!className) {
+          return groups;
+        }
+
+        if (!groups[className]) {
+          groups[className] = {
+            className,
+            subjects: [],
+            topics: [],
+          };
+        }
+
+        if (
+          subject &&
+          !groups[className].subjects.includes(
+            subject
+          )
+        ) {
+          groups[className].subjects.push(
+            subject
+          );
+        }
+
+        groups[className].topics.push(item);
+
         return groups;
-      }
-
-      if (!groups[className]) {
-        groups[className] = {
-          className,
-          subjects: [],
-          topics: [],
-        };
-      }
-
-      if (
-        subject &&
-        !groups[className].subjects.includes(subject)
-      ) {
-        groups[className].subjects.push(subject);
-      }
-
-      groups[className].topics.push(item);
-
-      return groups;
-    }, {});
+      },
+      {}
+    );
 
   /*
    * Convert grouped object into array
    * and sort classes numerically.
    */
-  const classes = Object.values(groupedClasses).sort(
-    (a, b) => {
-      const numberA = parseInt(
-        a.className.replace(/\D/g, ""),
-        10
-      );
+  const classes = Object.values(
+    groupedClasses
+  ).sort((a, b) => {
+    const numberA = parseInt(
+      a.className.replace(/\D/g, ""),
+      10
+    );
 
-      const numberB = parseInt(
-        b.className.replace(/\D/g, ""),
-        10
-      );
+    const numberB = parseInt(
+      b.className.replace(/\D/g, ""),
+      10
+    );
 
-      if (Number.isNaN(numberA)) {
-        return 1;
-      }
-
-      if (Number.isNaN(numberB)) {
-        return -1;
-      }
-
-      return numberA - numberB;
+    if (Number.isNaN(numberA)) {
+      return 1;
     }
-  );
+
+    if (Number.isNaN(numberB)) {
+      return -1;
+    }
+
+    return numberA - numberB;
+  });
 
   /*
-   * If Firestore has no syllabus documents yet,
-   * show the default class structure.
+   * Default class structure.
    */
   const defaultClasses = [
     {
@@ -200,15 +214,22 @@ function Syllabus() {
     },
   ];
 
+  /*
+   * Firebase data available ho to Firebase data.
+   * Warna default classes.
+   */
   const displayClasses =
     classes.length > 0
       ? classes
       : defaultClasses;
 
   const getClassNumber = (className) => {
-    const number = className.match(/\d+/);
+    const number =
+      className.match(/\d+/);
 
-    return number ? number[0] : "10+";
+    return number
+      ? number[0]
+      : "10+";
   };
 
   return (
@@ -287,21 +308,23 @@ function Syllabus() {
               ERROR
           ================================================= */}
 
-          {!loading && errorMessage && (
-            <div
-              style={{
-                marginBottom: "30px",
-                padding: "16px 18px",
-                borderRadius: "12px",
-                background: "#fef2f2",
-                color: "#b91c1c",
-                border: "1px solid #fecaca",
-                fontSize: "14px",
-              }}
-            >
-              ⚠ {errorMessage}
-            </div>
-          )}
+          {!loading &&
+            errorMessage && (
+              <div
+                style={{
+                  marginBottom: "30px",
+                  padding: "16px 18px",
+                  borderRadius: "12px",
+                  background: "#fef2f2",
+                  color: "#b91c1c",
+                  border:
+                    "1px solid #fecaca",
+                  fontSize: "14px",
+                }}
+              >
+                ⚠ {errorMessage}
+              </div>
+            )}
 
 
           {/* =================================================
@@ -361,9 +384,6 @@ function Syllabus() {
                   </div>
 
 
-                  {/* Topic count when Firebase
-                      syllabus data is available */}
-
                   {item.topics.length > 0 && (
                     <div
                       style={{
@@ -395,7 +415,8 @@ function Syllabus() {
 
                         if (element) {
                           element.scrollIntoView({
-                            behavior: "smooth",
+                            behavior:
+                              "smooth",
                             block: "center",
                           });
                         }
@@ -445,59 +466,54 @@ function Syllabus() {
 
               <div className="resource-grid">
 
-                {syllabusData
-                  .filter((item) => {
-                    return (
-                      !item.status ||
-                      item.status.toLowerCase() ===
-                        "published"
-                    );
-                  })
-                  .map((item) => (
-                    <div
-                      className="resource-card"
-                      id={`syllabus-${item.id}`}
-                      key={item.id}
-                    >
+                {syllabusData.map((item) => (
+                  <div
+                    className="resource-card"
+                    id={`syllabus-${item.id}`}
+                    key={item.id}
+                  >
 
-                      <div className="resource-icon">
-                        📚
-                      </div>
-
-                      <h3>
-                        {item.title ||
-                          "Syllabus Topic"}
-                      </h3>
-
-                      <p>
-                        {item.description ||
-                          `${item.subject || "Academic"} syllabus topic for ${
-                            item.className ||
-                            item.class ||
-                            "students"
-                          }.`}
-                      </p>
-
-                      <div
-                        style={{
-                          marginTop: "14px",
-                          color: "#1b63a8",
-                          fontSize: "13px",
-                          fontWeight: "700",
-                        }}
-                      >
-                        {item.className ||
-                          item.class ||
-                          "Class"}
-
-                        {" • "}
-
-                        {item.subject ||
-                          "Subject"}
-                      </div>
-
+                    <div className="resource-icon">
+                      📚
                     </div>
-                  ))}
+
+                    <h3>
+                      {item.title ||
+                        "Syllabus Topic"}
+                    </h3>
+
+                    <p>
+                      {item.description ||
+                        `${
+                          item.subject ||
+                          "Academic"
+                        } syllabus topic for ${
+                          item.className ||
+                          item.class ||
+                          "students"
+                        }.`}
+                    </p>
+
+                    <div
+                      style={{
+                        marginTop: "14px",
+                        color: "#1b63a8",
+                        fontSize: "13px",
+                        fontWeight: "700",
+                      }}
+                    >
+                      {item.className ||
+                        item.class ||
+                        "Class"}
+
+                      {" • "}
+
+                      {item.subject ||
+                        "Subject"}
+                    </div>
+
+                  </div>
+                ))}
 
               </div>
 

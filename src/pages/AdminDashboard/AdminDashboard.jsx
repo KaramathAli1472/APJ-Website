@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 
 import {
@@ -14,14 +15,12 @@ import "./AdminDashboard.css";
 function AdminDashboard() {
   const navigate = useNavigate();
 
-  const [loggingOut, setLoggingOut] =
-    useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  const [loadingStats, setLoadingStats] =
-    useState(true);
+  const [loadingStats, setLoadingStats] = useState(true);
 
   const [counts, setCounts] = useState({
-    applications: 0,
+    registrations: 0,
     notices: 0,
     gallery: 0,
     syllabus: 0,
@@ -33,13 +32,13 @@ function AdminDashboard() {
         setLoadingStats(true);
 
         const [
-          applicationsSnapshot,
+          registrationsSnapshot,
           noticesSnapshot,
           gallerySnapshot,
           syllabusSnapshot,
         ] = await Promise.all([
           getDocs(
-            collection(db, "applications")
+            collection(db, "registrations")
           ),
 
           getDocs(
@@ -56,34 +55,28 @@ function AdminDashboard() {
         ]);
 
         const publishedNotices =
-          noticesSnapshot.docs.filter(
-            (item) => {
-              const data = item.data();
+          noticesSnapshot.docs.filter((item) => {
+            const data = item.data();
 
-              return (
-                !data.status ||
-                data.status.toLowerCase() ===
-                  "published"
-              );
-            }
-          );
+            return (
+              !data.status ||
+              data.status.toLowerCase() === "published"
+            );
+          });
 
         const publishedSyllabus =
-          syllabusSnapshot.docs.filter(
-            (item) => {
-              const data = item.data();
+          syllabusSnapshot.docs.filter((item) => {
+            const data = item.data();
 
-              return (
-                !data.status ||
-                data.status.toLowerCase() ===
-                  "published"
-              );
-            }
-          );
+            return (
+              !data.status ||
+              data.status.toLowerCase() === "published"
+            );
+          });
 
         setCounts({
-          applications:
-            applicationsSnapshot.size,
+          registrations:
+            registrationsSnapshot.size,
 
           notices:
             publishedNotices.length,
@@ -109,23 +102,26 @@ function AdminDashboard() {
 
   const stats = [
     {
-      title: "Applications",
-      value: counts.applications,
-      icon: "📋",
-      description: "Admission applications",
+      title: "Registrations",
+      value: counts.registrations,
+      icon: "📝",
+      description: "Student registrations",
     },
+
     {
       title: "Notices",
       value: counts.notices,
       icon: "📢",
       description: "Published notices",
     },
+
     {
       title: "Gallery",
       value: counts.gallery,
       icon: "🖼️",
       description: "Uploaded photos",
     },
+
     {
       title: "Syllabus",
       value: counts.syllabus,
@@ -136,12 +132,13 @@ function AdminDashboard() {
 
   const managementItems = [
     {
-      title: "Admission Applications",
+      title: "Student Registrations",
       description:
-        "View and manage student admission enquiries.",
-      icon: "📋",
-      path: "/admin/applications",
+        "View, verify and manage student registrations.",
+      icon: "📝",
+      path: "/admin/registrations",
     },
+
     {
       title: "Syllabus",
       description:
@@ -149,6 +146,7 @@ function AdminDashboard() {
       icon: "📚",
       path: "/admin/syllabus",
     },
+
     {
       title: "Classes Management",
       description:
@@ -156,6 +154,7 @@ function AdminDashboard() {
       icon: "🎓",
       path: "/admin/classes",
     },
+
     {
       title: "Gallery",
       description:
@@ -163,6 +162,7 @@ function AdminDashboard() {
       icon: "🖼️",
       path: "/admin/gallery",
     },
+
     {
       title: "Notices",
       description:
@@ -232,11 +232,11 @@ function AdminDashboard() {
           </Link>
 
           <Link
-            to="/admin/applications"
+            to="/admin/registrations"
             className="admin-nav-item"
           >
-            <span>📋</span>
-            Applications
+            <span>📝</span>
+            Registrations
           </Link>
 
           <Link
@@ -314,6 +314,7 @@ function AdminDashboard() {
 
       </aside>
 
+
       {/* =========================
           MAIN CONTENT
       ========================= */}
@@ -352,6 +353,7 @@ function AdminDashboard() {
 
         </header>
 
+
         {/* =========================
             WELCOME
         ========================= */}
@@ -376,6 +378,7 @@ function AdminDashboard() {
           </div>
 
         </section>
+
 
         {/* =========================
             STATS
@@ -418,6 +421,7 @@ function AdminDashboard() {
 
         </section>
 
+
         {/* =========================
             MANAGEMENT
         ========================= */}
@@ -439,6 +443,7 @@ function AdminDashboard() {
             </div>
 
           </div>
+
 
           <div className="admin-management-grid">
 
