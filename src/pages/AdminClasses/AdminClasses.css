@@ -1,0 +1,648 @@
+.admin-classes-page {
+  min-height: 100vh;
+  padding: 40px;
+  background: #f5f7fb;
+  color: #172033;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.admin-classes-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.admin-classes-header > div > span {
+  display: block;
+  margin-bottom: 8px;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.admin-classes-header h1 {
+  margin: 0;
+  color: #172033;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.admin-classes-header p {
+  margin: 10px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.class-add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #172b4d;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(23, 43, 77, 0.16);
+  transition: 0.2s ease;
+}
+
+.class-add-button:hover {
+  background: #0f1f39;
+  transform: translateY(-1px);
+}
+
+.class-add-button span {
+  font-size: 21px;
+  line-height: 1;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.class-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.class-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid #e5eaf2;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 5px 18px rgba(30, 41, 59, 0.04);
+}
+
+.class-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #eef4ff;
+  font-size: 21px;
+}
+
+.class-stat-icon.active {
+  background: #ecfdf3;
+}
+
+.class-stat-icon.inactive {
+  background: #fef2f2;
+}
+
+.class-stat-icon.students {
+  background: #f5f3ff;
+}
+
+.class-stat-card span {
+  display: block;
+  margin-bottom: 5px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.class-stat-card strong {
+  display: block;
+  color: #172033;
+  font-size: 25px;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.classes-content-card {
+  overflow: hidden;
+  border: 1px solid #e5eaf2;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 5px 18px rgba(30, 41, 59, 0.04);
+}
+
+.classes-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.classes-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+  padding: 11px 14px;
+  border: 1px solid #dfe5ee;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.classes-search span {
+  color: #94a3b8;
+  font-size: 22px;
+}
+
+.classes-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #172033;
+  font-size: 14px;
+  background: transparent;
+}
+
+.classes-search input::placeholder {
+  color: #9ca3af;
+}
+
+.classes-toolbar select {
+  min-width: 150px;
+  padding: 11px 14px;
+  border: 1px solid #dfe5ee;
+  border-radius: 9px;
+  outline: 0;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.classes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  padding: 22px;
+}
+
+.class-admin-card {
+  padding: 22px;
+  border: 1px solid #e5eaf2;
+  border-radius: 14px;
+  background: #ffffff;
+  transition: 0.2s ease;
+}
+
+.class-admin-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 25px rgba(30, 41, 59, 0.07);
+  transform: translateY(-2px);
+}
+
+.class-card-top {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.class-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 49px;
+  height: 49px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: #172b4d;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.class-label {
+  display: block;
+  margin-bottom: 3px;
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.class-card-top h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 18px;
+}
+
+.class-status {
+  margin-left: auto;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.class-status.active {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.class-status.inactive {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.class-section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.class-section-row span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.class-section-row strong {
+  color: #172033;
+  font-size: 13px;
+}
+
+.class-description {
+  min-height: 43px;
+  margin: 15px 0;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.class-subjects > span {
+  display: block;
+  margin-bottom: 8px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.class-subjects > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.subject-chip {
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #eef4ff;
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.class-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0f5;
+}
+
+.student-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.student-count > span {
+  font-size: 13px;
+}
+
+.student-count strong {
+  color: #172033;
+  font-size: 13px;
+}
+
+.student-count small {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.class-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.class-actions button {
+  padding: 7px 11px;
+  border: 1px solid #dfe5ee;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.class-actions button:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.class-actions button.delete {
+  color: #dc2626;
+}
+
+.class-actions button.delete:hover {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.classes-empty {
+  grid-column: 1 / -1;
+  padding: 70px 20px;
+  text-align: center;
+}
+
+.classes-empty > span {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 42px;
+}
+
+.classes-empty h3 {
+  margin: 0 0 7px;
+  color: #172033;
+}
+
+.classes-empty p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.class-modal-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.58);
+}
+
+.class-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 25px 70px rgba(15, 23, 42, 0.25);
+}
+
+.class-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 26px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.class-modal-header span {
+  display: block;
+  margin-bottom: 7px;
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.class-modal-header h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 23px;
+}
+
+.class-modal-header > button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+.class-form {
+  padding: 26px;
+}
+
+.class-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.class-field {
+  margin-bottom: 18px;
+}
+
+.class-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.class-field input,
+.class-field select,
+.class-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 13px;
+  border: 1px solid #dfe5ee;
+  border-radius: 9px;
+  outline: none;
+  color: #172033;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.class-field input:focus,
+.class-field select:focus,
+.class-field textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.class-field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.class-field small {
+  display: block;
+  margin-top: 6px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.class-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.class-form-actions button {
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.class-form-actions .cancel {
+  border: 1px solid #dfe5ee;
+  background: #ffffff;
+  color: #475569;
+}
+
+.class-form-actions .save {
+  border: 0;
+  background: #172b4d;
+  color: #ffffff;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+  .class-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .classes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .admin-classes-page {
+    padding: 25px 18px;
+  }
+
+  .admin-classes-header {
+    flex-direction: column;
+  }
+
+  .class-add-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .classes-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .classes-search {
+    max-width: none;
+  }
+
+  .classes-toolbar select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-classes-page {
+    padding: 20px 14px;
+  }
+
+  .admin-classes-header h1 {
+    font-size: 26px;
+  }
+
+  .class-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .classes-grid {
+    padding: 14px;
+  }
+
+  .class-admin-card {
+    padding: 17px;
+  }
+
+  .class-card-top {
+    align-items: flex-start;
+  }
+
+  .class-status {
+    margin-left: auto;
+  }
+
+  .class-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .class-actions {
+    width: 100%;
+  }
+
+  .class-actions button {
+    flex: 1;
+  }
+
+  .class-form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .class-modal-overlay {
+    padding: 12px;
+  }
+
+  .class-modal-header,
+  .class-form {
+    padding: 20px;
+  }
+}

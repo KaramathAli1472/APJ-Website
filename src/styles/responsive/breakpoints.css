@@ -1,0 +1,7 @@
+:root {
+  --breakpoint-mobile: 600px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-laptop: 1024px;
+  --breakpoint-desktop: 1200px;
+  --breakpoint-wide: 1440px;
+}

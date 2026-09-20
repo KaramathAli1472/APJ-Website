@@ -1,0 +1,11 @@
+.footer a {
+  text-decoration: none;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer img {
+  max-width: 100%;
+}

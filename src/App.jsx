@@ -1,0 +1,188 @@
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+
+import MainLayout from "./layouts/MainLayout/MainLayout";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+
+// =========================
+// Public Pages
+// =========================
+
+import Home from "./pages/Home/Home";
+import About from "./pages/About/About";
+import Admission from "./pages/Admission/Admission";
+import Syllabus from "./pages/Syllabus/Syllabus";
+import Classes from "./pages/Classes/Classes";
+import Gallery from "./pages/Gallery/Gallery";
+import Notices from "./pages/Notices/Notices";
+import FAQ from "./pages/FAQ/FAQ";
+import Contact from "./pages/Contact/Contact";
+
+// =========================
+// Admin Pages
+// =========================
+
+import AdminLogin from "./pages/AdminLogin/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
+
+import AdminApplications from "./pages/AdminApplications/AdminApplications";
+import AdminSyllabus from "./pages/AdminSyllabus/AdminSyllabus";
+import AdminClasses from "./pages/AdminClasses/AdminClasses";
+import AdminGallery from "./pages/AdminGallery/AdminGallery";
+import AdminNotices from "./pages/AdminNotices/AdminNotices";
+import AdminSettings from "./pages/AdminSettings/AdminSettings";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+
+        {/* ==================================================
+            PUBLIC WEBSITE
+        ================================================== */}
+
+        <Route element={<MainLayout />}>
+
+          {/* Home */}
+          <Route
+            path="/"
+            element={<Home />}
+          />
+
+          {/* About */}
+          <Route
+            path="/about"
+            element={<About />}
+          />
+
+          {/* Admission */}
+          <Route
+            path="/admission"
+            element={<Admission />}
+          />
+
+          {/* Syllabus */}
+          <Route
+            path="/syllabus"
+            element={<Syllabus />}
+          />
+
+          {/* Classes */}
+          <Route
+            path="/classes"
+            element={<Classes />}
+          />
+
+          {/* Gallery */}
+          <Route
+            path="/gallery"
+            element={<Gallery />}
+          />
+
+          {/* Notices */}
+          <Route
+            path="/notices"
+            element={<Notices />}
+          />
+
+          {/* FAQ */}
+          <Route
+            path="/faq"
+            element={<FAQ />}
+          />
+
+          {/* Contact */}
+          <Route
+            path="/contact"
+            element={<Contact />}
+          />
+
+        </Route>
+
+
+        {/* ==================================================
+            ADMIN LOGIN
+        ================================================== */}
+
+        <Route
+          path="/admin/login"
+          element={<AdminLogin />}
+        />
+
+
+        {/* ==================================================
+            PROTECTED ADMIN PANEL
+        ================================================== */}
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/applications"
+          element={
+            <ProtectedRoute>
+              <AdminApplications />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/syllabus"
+          element={
+            <ProtectedRoute>
+              <AdminSyllabus />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/classes"
+          element={
+            <ProtectedRoute>
+              <AdminClasses />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/gallery"
+          element={
+            <ProtectedRoute>
+              <AdminGallery />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/notices"
+          element={
+            <ProtectedRoute>
+              <AdminNotices />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/settings"
+          element={
+            <ProtectedRoute>
+              <AdminSettings />
+            </ProtectedRoute>
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
