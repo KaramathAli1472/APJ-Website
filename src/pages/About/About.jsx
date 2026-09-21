@@ -48,7 +48,7 @@ function About() {
             <p>
               Through APJ EDU, students and parents can access
               useful academic information, syllabus resources,
-              admission information, notices and other educational
+              registration information, notices and other educational
               services in one place.
             </p>
 
@@ -56,7 +56,7 @@ function About() {
               to="/admission"
               className="about-primary-button"
             >
-              Explore Admission →
+              Explore Registration →
             </Link>
           </div>
 

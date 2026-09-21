@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import "./Home.css";
 
 function Home() {
-  const classes = [4, 5, 6, 7, 8, 9, 10];
+  const classes = [4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   return (
     <div className="home-page">
@@ -30,7 +30,7 @@ function Home() {
 
             <div className="hero-buttons">
               <Link to="/admission" className="btn btn-primary">
-                Apply for Admission
+                Apply for Registration
               </Link>
 
               <Link to="/syllabus" className="btn btn-outline">
@@ -40,7 +40,7 @@ function Home() {
 
             <div className="hero-stats">
               <div>
-                <strong>4–10</strong>
+                <strong>4–12</strong>
                 <span>Classes</span>
               </div>
 
@@ -142,7 +142,7 @@ function Home() {
 
           <p className="section-description">
             Discover academic resources and syllabus information
-            for classes 4 to 10.
+            for classes 4 to 12.
           </p>
 
           <div className="classes-grid">
@@ -251,13 +251,13 @@ function Home() {
             </h2>
 
             <p>
-              Explore our admission process and take the first step
+              Explore our registration process and take the first step
               towards a brighter future.
             </p>
           </div>
 
           <Link to="/admission" className="cta-button">
-            Apply Now →
+            Register Now →
           </Link>
 
         </div>

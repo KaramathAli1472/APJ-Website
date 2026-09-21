@@ -29,7 +29,7 @@ function FAQ() {
 
           <p>
             Find answers to common questions about
-            APJ EDU, academics and admissions.
+            APJ EDU, academics and registrations.
           </p>
 
         </div>

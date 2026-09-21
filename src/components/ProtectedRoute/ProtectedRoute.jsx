@@ -9,15 +9,38 @@ function ProtectedRoute({ children }) {
   const location = useLocation();
 
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAuth, setCheckingAuth] =
     useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,
-      (currentUser) => {
-        setUser(currentUser);
-        setCheckingAuth(false);
+      async (currentUser) => {
+        if (!currentUser) {
+          setUser(null);
+          setIsAdmin(false);
+          setCheckingAuth(false);
+          return;
+        }
+
+        try {
+          const tokenResult =
+            await currentUser.getIdTokenResult();
+
+          setUser(currentUser);
+          setIsAdmin(tokenResult.claims.admin === true);
+        } catch (error) {
+          console.error(
+            "Admin claim check error:",
+            error
+          );
+
+          setUser(null);
+          setIsAdmin(false);
+        } finally {
+          setCheckingAuth(false);
+        }
       }
     );
 
@@ -41,7 +64,7 @@ function ProtectedRoute({ children }) {
     );
   }
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return (
       <Navigate
         to="/admin/login"

@@ -6,6 +6,7 @@ import {
 
 import MainLayout from "./layouts/MainLayout/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import StudentProtectedRoute from "./components/StudentProtectedRoute/StudentProtectedRoute";
 
 // =========================
 // Public Pages
@@ -20,6 +21,8 @@ import Gallery from "./pages/Gallery/Gallery";
 import Notices from "./pages/Notices/Notices";
 import FAQ from "./pages/FAQ/FAQ";
 import Contact from "./pages/Contact/Contact";
+import StudentLogin from "./pages/StudentLogin/StudentLogin";
+import StudentDashboard from "./pages/StudentDashboard/StudentDashboard";
 
 // =========================
 // Admin Pages
@@ -34,6 +37,8 @@ import AdminClasses from "./pages/AdminClasses/AdminClasses";
 import AdminGallery from "./pages/AdminGallery/AdminGallery";
 import AdminNotices from "./pages/AdminNotices/AdminNotices";
 import AdminSettings from "./pages/AdminSettings/AdminSettings";
+import AdminExams from "./pages/AdminExams/AdminExams";
+import StudentExam from "./pages/StudentExam/StudentExam";
 
 function App() {
   return (
@@ -100,7 +105,21 @@ function App() {
             element={<Contact />}
           />
 
+          <Route
+            path="/student/login"
+            element={<StudentLogin />}
+          />
+
         </Route>
+
+        <Route
+          path="/student/dashboard"
+          element={
+            <StudentProtectedRoute>
+              <StudentDashboard />
+            </StudentProtectedRoute>
+          }
+        />
 
 
         {/* ==================================================
@@ -197,6 +216,24 @@ function App() {
             <ProtectedRoute>
               <AdminSettings />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/exams"
+          element={
+            <ProtectedRoute>
+              <AdminExams />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/exams/:examId"
+          element={
+            <StudentProtectedRoute>
+              <StudentExam />
+            </StudentProtectedRoute>
           }
         />
 

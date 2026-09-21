@@ -298,11 +298,11 @@ function AdminApplications() {
           <span>ADMINISTRATION</span>
 
           <h1>
-            Admission Applications
+            Registration Applications
           </h1>
 
           <p>
-            Review and manage student admission
+            Review and manage student registration
             applications.
           </p>
         </div>
@@ -601,7 +601,7 @@ function AdminApplications() {
                         <p>
                           {applications.length ===
                           0
-                            ? "No admission applications have been submitted yet."
+                            ? "No registration applications have been submitted yet."
                             : "Try changing your search or status filter."}
                         </p>
                       </div>

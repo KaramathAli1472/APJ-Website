@@ -8,7 +8,7 @@ const navigationData = [
     path: "/about",
   },
   {
-    label: "Admission",
+    label: "Registration",
     path: "/admission",
   },
   {

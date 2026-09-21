@@ -9,6 +9,7 @@ import {
   getDocs,
   orderBy,
   query,
+  where,
 } from "firebase/firestore";
 
 import { db } from "../../services/firestore/firestoreService";
@@ -23,6 +24,7 @@ function Classes() {
   useEffect(() => {
     const classesQuery = query(
       collection(db, "classes"),
+      where("status", "==", "Active"),
       orderBy("createdAt", "desc")
     );
 
@@ -93,7 +95,7 @@ function Classes() {
 
           <p>
             Explore academic information and learning
-            resources for students from Class 4 to Class 10.
+            resources for students from Class 4 to Class 12.
           </p>
 
         </div>

@@ -87,7 +87,7 @@
 /* Introduction */
 
 .about-intro {
-  padding: 100px 20px;
+  padding: 72px 20px;
   background: #ffffff;
 }
 
@@ -229,7 +229,7 @@
 /* Mission */
 
 .about-mission {
-  padding: 100px 20px;
+  padding: 72px 20px;
   background: #f8fafc;
 }
 
@@ -314,7 +314,7 @@
 /* Values */
 
 .about-values {
-  padding: 100px 20px;
+  padding: 72px 20px;
   background: #ffffff;
 }
 
@@ -454,7 +454,7 @@
 
 @media (max-width: 700px) {
   .about-hero {
-    padding: 75px 20px 70px;
+    padding: 56px 20px 52px;
   }
 
   .about-hero h1 {

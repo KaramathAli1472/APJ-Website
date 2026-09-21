@@ -17,7 +17,7 @@
 
 .gallery-hero {
   position: relative;
-  padding: 90px 0;
+  padding: 72px 0;
   overflow: hidden;
   background:
     linear-gradient(
@@ -93,7 +93,7 @@
 ======================================== */
 
 .gallery-section {
-  padding: 100px 0;
+  padding: 72px 0;
   background: #ffffff;
 }
 
@@ -107,7 +107,7 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 45px 0 40px;
+  margin: 32px 0 28px;
 }
 
 .gallery-filter {
@@ -147,7 +147,7 @@
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 18px;
 }
 
 /* ========================================
@@ -157,7 +157,7 @@
 .gallery-card {
   overflow: hidden;
   border: 1px solid #e2e8f0;
-  border-radius: 18px;
+  border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
   transition:
@@ -258,7 +258,7 @@
 ======================================== */
 
 .gallery-cta {
-  padding: 75px 0;
+  padding: 60px 0;
   background: #0b1f3a;
 }
 
@@ -298,11 +298,11 @@
 
 @media (max-width: 1024px) {
   .gallery-hero {
-    padding: 75px 0;
+    padding: 56px 0;
   }
 
   .gallery-section {
-    padding: 80px 0;
+    padding: 60px 0;
   }
 
   .gallery-grid {

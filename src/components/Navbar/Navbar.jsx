@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import societyLogo from "../../assets/logo/logo.png.jpeg";
 import "./Navbar.css";
 
 function Navbar() {
@@ -18,7 +19,11 @@ function Navbar() {
           className="navbar-logo"
           onClick={closeMenu}
         >
-          <span className="logo-mark">A</span>
+          <img
+            src={societyLogo}
+            alt="APJ Abdul Kalam Welfare Society"
+            className="logo-mark"
+          />
 
           <span className="logo-text">
             <strong>APJ</strong>
@@ -54,7 +59,7 @@ function Navbar() {
           </NavLink>
 
           <NavLink to="/admission" onClick={closeMenu}>
-            Admission
+            Registration
           </NavLink>
 
           <NavLink to="/syllabus" onClick={closeMenu}>
@@ -82,11 +87,19 @@ function Navbar() {
           </NavLink>
 
           <NavLink
+            to="/student/login"
+            className="navbar-student-login-btn"
+            onClick={closeMenu}
+          >
+            Student Login
+          </NavLink>
+
+          <NavLink
             to="/admission"
             className="navbar-apply-btn"
             onClick={closeMenu}
           >
-            Apply Now
+            Register Now
           </NavLink>
         </nav>
 

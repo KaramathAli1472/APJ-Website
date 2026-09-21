@@ -34,6 +34,16 @@ const classesData = [
     name: "Class 10",
     description: "Academic resources and syllabus for Class 10 students.",
   },
+  {
+    id: 11,
+    name: "Class 11",
+    description: "Academic resources and syllabus for Class 11 students.",
+  },
+  {
+    id: 12,
+    name: "Class 12",
+    description: "Academic resources and syllabus for Class 12 students.",
+  },
 ];
 
 export default classesData;

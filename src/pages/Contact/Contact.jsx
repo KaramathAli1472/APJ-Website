@@ -151,7 +151,7 @@ function Contact() {
                 </h2>
 
                 <p>
-                  For admission enquiries, academic
+                  For registration enquiries, academic
                   information or general questions,
                   you can contact us through the
                   details below.

@@ -9,7 +9,7 @@ const faqData = [
     id: 2,
     question: "Which classes are available?",
     answer:
-      "The website provides academic information and resources for students from Class 4 to Class 10.",
+      "The website provides academic information and resources for students from Class 4 to Class 12.",
   },
   {
     id: 3,
@@ -19,9 +19,9 @@ const faqData = [
   },
   {
     id: 4,
-    question: "How can I apply for admission?",
+    question: "How can I complete registration?",
     answer:
-      "You can visit the Admission page and follow the available admission instructions and application process.",
+      "You can visit the Registration page and follow the available registration instructions and application process.",
   },
   {
     id: 5,

@@ -254,7 +254,7 @@ function Syllabus() {
           <p>
             Find academic subjects and syllabus
             information for students from Class 4
-            to Class 10.
+            to Class 12.
           </p>
 
         </div>
@@ -271,7 +271,7 @@ function Syllabus() {
           <div className="syllabus-heading">
 
             <span className="syllabus-section-label">
-              CLASSES 4–10
+              CLASSES 4–12
             </span>
 
             <h2>

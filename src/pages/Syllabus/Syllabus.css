@@ -15,7 +15,7 @@
 
 .syllabus-hero {
   position: relative;
-  padding: 100px 20px 95px;
+  padding: 72px 20px 68px;
   background:
     linear-gradient(
       135deg,
@@ -118,18 +118,18 @@
 /* Syllabus Section */
 
 .syllabus-intro {
-  padding: 100px 20px;
+  padding: 72px 20px;
   background: #ffffff;
 }
 
 .syllabus-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 18px;
 }
 
 .syllabus-card {
-  padding: 28px;
+  padding: 24px;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   background: #ffffff;
@@ -225,7 +225,7 @@
 /* Resources */
 
 .syllabus-resources {
-  padding: 100px 20px;
+  padding: 72px 20px;
   background: #f8fafc;
 }
 
@@ -358,7 +358,7 @@
 
 @media (max-width: 650px) {
   .syllabus-hero {
-    padding: 75px 20px 70px;
+    padding: 56px 20px 52px;
   }
 
   .syllabus-hero h1 {

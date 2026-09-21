@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import societyLogo from "../../assets/logo/logo.png.jpeg";
 import "./Footer.css";
 
 function Footer() {
@@ -12,7 +13,11 @@ function Footer() {
           {/* Brand */}
           <div className="footer-brand">
             <Link to="/" className="footer-logo">
-              <span className="footer-logo-mark">A</span>
+              <img
+                src={societyLogo}
+                alt="APJ Abdul Kalam Welfare Society"
+                className="footer-logo-mark"
+              />
 
               <span>
                 <strong>APJ EDU</strong>
@@ -33,7 +38,7 @@ function Footer() {
 
             <Link to="/">Home</Link>
             <Link to="/about">About Us</Link>
-            <Link to="/admission">Admission</Link>
+            <Link to="/admission">Registration</Link>
             <Link to="/syllabus">Syllabus</Link>
             <Link to="/classes">Classes</Link>
           </div>

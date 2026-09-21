@@ -8,7 +8,8 @@
 
   background: rgba(255, 255, 255, 0.96);
 
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -18,7 +19,7 @@
   width: 100%;
   max-width: 1280px;
 
-  min-height: 76px;
+  min-height: 72px;
 
   margin: 0 auto;
   padding: 0 24px;
@@ -46,22 +47,18 @@
 }
 
 .logo-mark {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
 
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
 
-  border-radius: 11px;
+  border-radius: 50%;
+  object-fit: cover;
 
-  background: #2563eb;
-  color: #ffffff;
-
-  font-size: 22px;
-  font-weight: 800;
-
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.16);
 }
 
 .logo-text {
@@ -103,7 +100,7 @@
 .navbar-menu > a:not(.navbar-apply-btn) {
   position: relative;
 
-  padding: 10px 11px;
+  padding: 9px 11px;
 
   color: #475569;
 
@@ -180,6 +177,28 @@
   transform: translateY(-2px);
 
   box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+}
+
+.navbar-student-login-btn {
+  margin-left: 4px;
+  padding: 9px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.navbar-student-login-btn:hover,
+.navbar-student-login-btn.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 /* Mobile Menu Button */
@@ -302,6 +321,13 @@
 
     text-align: center;
   }
+
+  .navbar-student-login-btn {
+    width: 100%;
+    margin: 8px 0 0;
+    padding: 13px;
+    text-align: center;
+  }
 }
 
 @media (max-width: 600px) {
@@ -310,10 +336,8 @@
   }
 
   .logo-mark {
-    width: 40px;
-    height: 40px;
-
-    font-size: 20px;
+    width: 34px;
+    height: 34px;
   }
 
   .logo-text strong {

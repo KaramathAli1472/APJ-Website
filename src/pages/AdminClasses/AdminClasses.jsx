@@ -686,8 +686,12 @@ return (
                   )
                 )}
 
-                <option value="Intermediate">
-                  Intermediate
+                <option value="Class 11">
+                  Class 11
+                </option>
+
+                <option value="Class 12">
+                  Class 12
                 </option>
 
               </select>

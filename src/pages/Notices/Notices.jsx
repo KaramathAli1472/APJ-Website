@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
-import noticesData from "../../data/notices/noticesData";
 import { formatDateLong } from "../../utils/formatters/dateFormatter";
 
 import {
   collection,
   getDocs,
-  orderBy,
   query,
+  where,
 } from "firebase/firestore";
 
 import { db } from "../../services/firestore/firestoreService";
@@ -18,59 +17,105 @@ import "./Notices.css";
 
 function Notices() {
   const [notices, setNotices] = useState([]);
-  const [activeCategory, setActiveCategory] =
-    useState("All");
-  const [loading, setLoading] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  /*
+   * Firebase Timestamp / Date / String
+   * sab ko Date object mein convert karna.
+   */
+  const getNoticeDate = (dateValue) => {
+    if (!dateValue) {
+      return new Date();
+    }
+
+    // Firebase Timestamp
+    if (typeof dateValue.toDate === "function") {
+      return dateValue.toDate();
+    }
+
+    // JavaScript Date
+    if (dateValue instanceof Date) {
+      return dateValue;
+    }
+
+    // String / number
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return new Date();
+    }
+
+    return date;
+  };
 
   useEffect(() => {
     const loadNotices = async () => {
       try {
+        setLoading(true);
+        setError("");
+
+        /*
+         * Firebase se sirf Published notices fetch kar rahe hain.
+         *
+         * orderBy() intentionally use nahi kar rahe,
+         * taake Firestore composite index ki zaroorat na pade.
+         */
         const noticesQuery = query(
           collection(db, "notices"),
-          orderBy("createdAt", "desc")
+          where("status", "==", "Published")
         );
 
         const snapshot = await getDocs(noticesQuery);
 
-        const firebaseNotices = snapshot.docs
-          .map((item) => ({
+        const firebaseNotices = snapshot.docs.map((item) => {
+          const data = item.data();
+
+          return {
             id: item.id,
-            ...item.data(),
-          }))
-          .filter(
-            (item) =>
-              !item.status ||
-              item.status.toLowerCase() ===
-                "published"
-          )
-          .map((item) => ({
-            id: item.id,
+
             title:
-              item.title ||
+              data.title ||
               "APJ EDU Announcement",
 
             category:
-              item.category ||
+              data.category ||
               "General",
 
             description:
-              item.description ||
+              data.description ||
               "",
 
             date:
-              item.createdAt ||
-              new Date().toISOString(),
-          }));
+              data.createdAt ||
+              null,
+
+            status:
+              data.status ||
+              "Published",
+          };
+        });
+
+        /*
+         * Latest notice sabse upar.
+         */
+        firebaseNotices.sort((a, b) => {
+          const dateA = getNoticeDate(a.date).getTime();
+          const dateB = getNoticeDate(b.date).getTime();
+
+          return dateB - dateA;
+        });
 
         setNotices(firebaseNotices);
       } catch (error) {
-        console.error(
-          "Notices loading error:",
-          error
-        );
+        console.error("Notices loading error:", error);
 
-        // Firebase error hone par fallback data use hoga.
         setNotices([]);
+
+        setError(
+          "Unable to load notices right now. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
@@ -80,21 +125,9 @@ function Notices() {
   }, []);
 
   /*
-   * Firebase mein notices available hain
-   * to Firebase data use hoga.
-   *
-   * Agar Firebase empty hai to local noticesData
-   * fallback ke taur par show hoga.
-   */
-  const displayNotices =
-    notices.length > 0
-      ? notices
-      : noticesData;
-
-  /*
    * Firebase se categories dynamically create karna.
    */
-  const firebaseCategories = [
+  const categories = [
     "All",
     ...Array.from(
       new Set(
@@ -106,67 +139,25 @@ function Notices() {
   ];
 
   /*
-   * Firebase empty hone par local categories.
-   */
-  const fallbackCategories = [
-    "All",
-    ...Array.from(
-      new Set(
-        noticesData.map(
-          (notice) => notice.category
-        )
-      )
-    ),
-  ];
-
-  const categories =
-    notices.length > 0
-      ? firebaseCategories
-      : fallbackCategories;
-
-  /*
    * Agar selected category available nahi hai
    * to All select karna.
    */
   useEffect(() => {
-    if (
-      !categories.includes(activeCategory)
-    ) {
+    if (!categories.includes(activeCategory)) {
       setActiveCategory("All");
     }
   }, [activeCategory, categories]);
 
+  /*
+   * Category ke according notices filter karna.
+   */
   const filteredNotices =
     activeCategory === "All"
-      ? displayNotices
-      : displayNotices.filter(
+      ? notices
+      : notices.filter(
           (notice) =>
             notice.category === activeCategory
         );
-
-  /*
-   * Firestore Timestamp / Date / String
-   * sab ko Date object mein convert karna.
-   */
-  const getNoticeDate = (dateValue) => {
-    if (!dateValue) {
-      return new Date();
-    }
-
-    if (
-      typeof dateValue.toDate === "function"
-    ) {
-      return dateValue.toDate();
-    }
-
-    const date = new Date(dateValue);
-
-    if (Number.isNaN(date.getTime())) {
-      return new Date();
-    }
-
-    return date;
-  };
 
   return (
     <div className="notices-page">
@@ -185,7 +176,7 @@ function Notices() {
 
           <p>
             Stay updated with important academic,
-            admission and general announcements.
+            registration and general announcements.
           </p>
 
         </div>
@@ -202,51 +193,95 @@ function Notices() {
           />
 
           {/* Category Filters */}
-          <div className="notices-filters">
+          {!loading &&
+            !error &&
+            notices.length > 0 && (
+              <div className="notices-filters">
 
-            {categories.map((category) => (
-              <button
-                type="button"
-                key={category}
-                className={
-                  activeCategory === category
-                    ? "notice-filter active"
-                    : "notice-filter"
-                }
-                onClick={() =>
-                  setActiveCategory(category)
-                }
-              >
-                {category}
-              </button>
-            ))}
+                {categories.map((category) => (
+                  <button
+                    type="button"
+                    key={category}
+                    className={
+                      activeCategory === category
+                        ? "notice-filter active"
+                        : "notice-filter"
+                    }
+                    onClick={() =>
+                      setActiveCategory(category)
+                    }
+                  >
+                    {category}
+                  </button>
+                ))}
 
-          </div>
+              </div>
+            )}
 
           {/* Loading */}
           {loading && (
             <div
               style={{
                 textAlign: "center",
-                padding: "30px 20px",
+                padding: "50px 20px",
                 color: "#64748b",
-                fontSize: "14px",
+                fontSize: "15px",
               }}
             >
-              Loading notices...
+              Loading latest notices...
             </div>
           )}
 
-          {/* Notice List */}
-          {!loading && (
-            <div className="notices-list">
+          {/* Firebase Error */}
+          {!loading && error && (
+            <div className="notices-empty">
 
-              {filteredNotices.length > 0 ? (
-                filteredNotices.map((notice) => {
+              <div className="notices-empty-icon">
+                📢
+              </div>
+
+              <h3>
+                Unable to Load Notices
+              </h3>
+
+              <p>
+                {error}
+              </p>
+
+            </div>
+          )}
+
+          {/* No Notices */}
+          {!loading &&
+            !error &&
+            notices.length === 0 && (
+              <div className="notices-empty">
+
+                <div className="notices-empty-icon">
+                  📢
+                </div>
+
+                <h3>
+                  No notices available
+                </h3>
+
+                <p>
+                  There are currently no published
+                  notices available.
+                </p>
+
+              </div>
+            )}
+
+          {/* Notice List */}
+          {!loading &&
+            !error &&
+            filteredNotices.length > 0 && (
+              <div className="notices-list">
+
+                {filteredNotices.map((notice) => {
                   const noticeDate =
-                    getNoticeDate(
-                      notice.date
-                    );
+                    getNoticeDate(notice.date);
 
                   return (
                     <article
@@ -306,28 +341,10 @@ function Notices() {
 
                     </article>
                   );
-                })
-              ) : (
-                <div className="notices-empty">
+                })}
 
-                  <div className="notices-empty-icon">
-                    📢
-                  </div>
-
-                  <h3>
-                    No notices found
-                  </h3>
-
-                  <p>
-                    There are no notices available
-                    in this category.
-                  </p>
-
-                </div>
-              )}
-
-            </div>
-          )}
+              </div>
+            )}
 
         </div>
       </section>
@@ -353,7 +370,7 @@ function Notices() {
             <p>
               Keep checking the Notices section for
               the latest updates related to academics,
-              admissions and student activities.
+              registrations and student activities.
             </p>
 
           </div>

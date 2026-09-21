@@ -79,6 +79,14 @@ function AdminRegistrations() {
   // DATE FORMAT
   // ============================================================
 
+  const getShortRegistrationId = (registrationId) => {
+    const value = String(registrationId || "");
+
+    return value.length > 13
+      ? value.slice(0, 13)
+      : value || "—";
+  };
+
   const getDate = (timestamp) => {
     if (!timestamp) {
       return "—";
@@ -968,8 +976,16 @@ function AdminRegistrations() {
                         <div className="registration-id-cell">
 
                           <strong>
-                            {registration.registrationId ||
-                              "—"}
+                            <span
+                              title={
+                                registration.registrationId ||
+                                "—"
+                              }
+                            >
+                              {getShortRegistrationId(
+                                registration.registrationId
+                              )}
+                            </span>
                           </strong>
 
                           <small>
@@ -1613,90 +1629,90 @@ function AdminRegistrations() {
                 )}
 
                 {/* ==================================================
-                    ID CARD ACTION
+                    ID CARD SECTION
                 ================================================== */}
 
-                {selectedRegistration.approvalStatus ===
-                  "Approved" && (
+                <div className="registration-detail-section">
 
-                  <div className="id-card-section">
+                  <div className="registration-detail-section-header">
 
-                    {selectedRegistration.idCardStatus !==
-                      "Generated" ? (
+                    <div>
 
-                      <>
+                      <span>
+                        ID CARD
+                      </span>
 
-                        <div className="id-card-next-step">
+                      <h3>
+                        Student ID Card
+                      </h3>
 
-                          <span>
-                            ✓ Registration approved
-                          </span>
+                    </div>
 
-                          <strong>
-                            Registration approved.
-                            ID card is ready to
-                            generate.
-                          </strong>
+                  </div>
 
-                        </div>
+                  <div className="registration-id-card-box">
 
-                        <button
-                          type="button"
-                          className="generate-id-card-button"
-                          disabled={
-                            actionLoading
-                          }
-                          onClick={() =>
-                            generateIdCard(
-                              selectedRegistration
-                            )
-                          }
-                        >
+                    <div>
 
-                          {actionLoading
-                            ? "Generating..."
-                            : "🎫 Generate ID Card"}
+                      <strong>
+                        {selectedRegistration.idCardStatus ||
+                          "Not Generated"}
+                      </strong>
 
-                        </button>
+                      <p>
+                        ID Card can only be generated after the
+                        registration has been approved and payment
+                        has been verified.
+                      </p>
 
-                      </>
+                    </div>
+
+                    {selectedRegistration.idCardStatus ===
+                    "Generated" ? (
+
+                      <button
+                        type="button"
+                        className="admin-registration-primary-button"
+                        onClick={() =>
+                          openIdCard(selectedRegistration)
+                        }
+                      >
+                        🎫 View ID Card
+                      </button>
+
+                    ) : selectedRegistration.approvalStatus ===
+                        "Approved" &&
+                      selectedRegistration.paymentStatus ===
+                        "Verified" ? (
+
+                      <button
+                        type="button"
+                        className="admin-registration-primary-button"
+                        disabled={actionLoading}
+                        onClick={() =>
+                          generateIdCard(selectedRegistration)
+                        }
+                      >
+                        {actionLoading
+                          ? "Generating..."
+                          : "🎫 Generate ID Card"}
+                      </button>
 
                     ) : (
 
-                      <>
-
-                        <div className="id-card-generated-success">
-
-                          <span>
-                            ✓ ID Card Generated
-                          </span>
-
-                          <strong>
-                            This student's ID card
-                            has already been generated.
-                          </strong>
-
-                        </div>
-
-                        <button
-                          type="button"
-                          className="view-id-card-button"
-                          onClick={() =>
-                            openIdCard(
-                              selectedRegistration
-                            )
-                          }
-                        >
-                          🎫 View ID Card
-                        </button>
-
-                      </>
+                      <button
+                        type="button"
+                        className="admin-registration-disabled-button"
+                        disabled
+                      >
+                        🔒 Generate ID Card
+                      </button>
 
                     )}
 
                   </div>
 
-                )}
+                </div>
 
               </div>
 

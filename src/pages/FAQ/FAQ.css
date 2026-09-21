@@ -17,7 +17,7 @@
 
 .faq-hero {
   position: relative;
-  padding: 90px 0;
+  padding: 72px 0;
   overflow: hidden;
   background:
     linear-gradient(
@@ -94,7 +94,7 @@
 ======================================== */
 
 .faq-section {
-  padding: 100px 0;
+  padding: 72px 0;
   background: #ffffff;
 }
 
@@ -105,9 +105,9 @@
 .faq-layout {
   display: grid;
   grid-template-columns: 0.75fr 1.25fr;
-  gap: 70px;
+  gap: 44px;
   align-items: start;
-  margin-top: 55px;
+  margin-top: 32px;
 }
 
 /* ========================================
@@ -117,9 +117,9 @@
 .faq-intro {
   position: sticky;
   top: 110px;
-  padding: 35px;
+  padding: 28px;
   border: 1px solid #dbeafe;
-  border-radius: 22px;
+  border-radius: 16px;
   background: #f8fbff;
 }
 
@@ -373,11 +373,11 @@
 
 @media (max-width: 1024px) {
   .faq-hero {
-    padding: 75px 0;
+    padding: 56px 0;
   }
 
   .faq-section {
-    padding: 80px 0;
+    padding: 60px 0;
   }
 
   .faq-layout {

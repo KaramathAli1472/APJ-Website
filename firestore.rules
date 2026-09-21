@@ -1,0 +1,114 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.admin == true;
+    }
+
+    match /registrations/{registrationId} {
+      allow create: if request.resource.data.keys().hasAll([
+        'registrationId',
+        'studentUid',
+        'studentName',
+        'fatherName',
+        'motherName',
+        'gender',
+        'dob',
+        'schoolName',
+        'className',
+        'medium',
+        'mobile',
+        'whatsapp',
+        'address',
+        'studentPhotoUrl',
+        'transactionNumber',
+        'paymentStatus',
+        'approvalStatus',
+        'createdAt'
+      ])
+      && request.resource.data.studentName is string
+      && request.resource.data.studentName.size() <= 100
+      && request.resource.data.studentUid == request.auth.uid
+      && request.resource.data.mobile is string
+      && request.resource.data.mobile.matches('^[0-9]{10}$')
+      && request.resource.data.whatsapp is string
+      && request.resource.data.whatsapp.matches('^[0-9]{10}$')
+      && request.resource.data.transactionNumber is string
+      && request.resource.data.transactionNumber.size() <= 100;
+
+      allow get: if isAdmin() ||
+        (request.auth != null &&
+          resource.data.studentUid == request.auth.uid);
+      allow list, update, delete: if isAdmin();
+    }
+
+    match /studentProfiles/{studentUid} {
+      allow get: if isAdmin() ||
+        (request.auth != null && request.auth.uid == studentUid);
+      allow list: if isAdmin();
+      allow create: if request.auth != null &&
+        request.auth.uid == studentUid &&
+        request.resource.data.studentUid == studentUid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /applications/{applicationId} {
+      allow create: if request.resource.data.keys().hasAll([
+        'createdAt'
+      ]);
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /notices/{noticeId} {
+      allow read: if isAdmin() || resource.data.status == 'Published';
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /syllabus/{syllabusId} {
+      allow read: if isAdmin() || resource.data.status == 'Published';
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /classes/{classId} {
+      allow read: if isAdmin() || resource.data.status == 'Active';
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /gallery/{galleryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if isAdmin() || settingId == 'website';
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /exams/{examId} {
+      allow get, list: if isAdmin() ||
+        (request.auth != null &&
+          resource.data.status == 'Published');
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /examAttempts/{attemptId} {
+      allow create: if request.auth != null &&
+        request.resource.data.studentUid == request.auth.uid;
+      allow get: if isAdmin() ||
+        (request.auth != null &&
+          resource.data.studentUid == request.auth.uid);
+      allow list: if isAdmin();
+      allow update: if isAdmin() ||
+        (request.auth != null &&
+          resource.data.studentUid == request.auth.uid &&
+          resource.data.submittedAt == null);
+      allow delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

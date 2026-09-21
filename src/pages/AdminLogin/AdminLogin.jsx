@@ -1,4 +1,5 @@
 import { useState } from "react";
+import societyLogo from "../../assets/logo/logo.png.jpeg";
 import { Link, useNavigate } from "react-router-dom";
 
 import { loginAdmin } from "../../services/auth/authService";
@@ -82,6 +83,13 @@ function AdminLogin() {
         setError(
           "Too many login attempts. Please try again later."
         );
+      } else if (
+        error.code ===
+        "auth/admin-claim-required"
+      ) {
+        setError(
+          "Login successful, but this account is not marked as an admin. Please add the admin claim in Firebase and try again."
+        );
       } else {
         setError(
           "Login failed. Please check your details and try again."
@@ -102,7 +110,10 @@ function AdminLogin() {
           className="admin-login-brand"
         >
           <div className="admin-login-brand-logo">
-            A
+            <img
+              src={societyLogo}
+              alt="APJ Abdul Kalam Welfare Society"
+            />
           </div>
 
           <div>
@@ -127,7 +138,7 @@ function AdminLogin() {
           </h1>
 
           <p>
-            Manage admissions, classes, syllabus,
+            Manage registrations, classes, syllabus,
             notices and website content from one
             secure dashboard.
           </p>

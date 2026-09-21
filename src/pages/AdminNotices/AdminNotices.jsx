@@ -155,7 +155,7 @@ item.status === "Draft"
 const importantCount =
 notices.filter(
 (item) =>
-item.category === "Admission" ||
+                  item.category === "Registration" ||
 item.category === "Examination"
 ).length;
 
@@ -775,8 +775,8 @@ return (
                   General
                 </option>
 
-                <option value="Admission">
-                  Admission
+                <option value="Registration">
+                  Registration
                 </option>
 
                 <option value="Scholarship">

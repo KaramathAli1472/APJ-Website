@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore";
 
 import { logoutAdmin } from "../../services/auth/authService";
+import societyLogo from "../../assets/logo/logo.png.jpeg";
 import { db } from "../../services/firestore/firestoreService";
 
 import "./AdminDashboard.css";
@@ -170,6 +171,14 @@ function AdminDashboard() {
       icon: "📢",
       path: "/admin/notices",
     },
+
+    {
+      title: "Exams",
+      description:
+        "Create timed MCQ exams and manage student assessments.",
+      icon: "🧪",
+      path: "/admin/exams",
+    },
   ];
 
   const handleLogout = async () => {
@@ -205,7 +214,10 @@ function AdminDashboard() {
           className="admin-sidebar-brand"
         >
           <div className="admin-sidebar-logo">
-            A
+            <img
+              src={societyLogo}
+              alt="APJ Abdul Kalam Welfare Society"
+            />
           </div>
 
           <div>
@@ -269,6 +281,14 @@ function AdminDashboard() {
           >
             <span>📢</span>
             Notices
+          </Link>
+
+          <Link
+            to="/admin/exams"
+            className="admin-nav-item"
+          >
+            <span>🧪</span>
+            Exams
           </Link>
 
           <span className="admin-nav-label">

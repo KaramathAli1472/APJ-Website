@@ -17,11 +17,11 @@ const noticesData = [
   },
   {
     id: 3,
-    title: "Admission Information",
+    title: "Registration Information",
     description:
-      "Students and parents can visit the Admission section for information about the admission process.",
+      "Students and parents can visit the Registration section for information about the registration process.",
     date: "2026-01-10",
-    category: "Admission",
+    category: "Registration",
   },
 ];
 

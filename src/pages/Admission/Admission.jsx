@@ -8,6 +8,10 @@ import {
 
 import { db } from "../../services/firestore/firestoreService";
 import cloudinaryConfig from "../../services/cloudinary/cloudinaryConfig";
+import {
+  createStudentAccount,
+  logoutAdmin,
+} from "../../services/auth/authService";
 
 import "./Admission.css";
 
@@ -225,12 +229,15 @@ function Admission() {
    * student's Registration ID.
    *
    * Example:
-   * APJ-2026-AbCdEfGh123...
+   * APJ-2026-DZW8
    */
   const createRegistrationId = (firestoreDocumentId) => {
     const currentYear = new Date().getFullYear();
+    const shortDocumentId = firestoreDocumentId
+      .slice(0, 4)
+      .toUpperCase();
 
-    return `APJ-${currentYear}-${firestoreDocumentId.toUpperCase()}`;
+    return `APJ-${currentYear}-${shortDocumentId}`;
   };
 
   const resetForm = () => {
@@ -304,6 +311,12 @@ function Admission() {
           registrationRef.id
         );
 
+      const studentUser =
+        await createStudentAccount(
+          generatedRegistrationId,
+          formData.dob
+        );
+
       /*
        * STEP 4
        * Prepare registration data.
@@ -312,6 +325,9 @@ function Admission() {
       const registrationData = {
         registrationId:
           generatedRegistrationId,
+
+        studentUid:
+          studentUser.uid,
 
         studentName:
           formData.studentName.trim(),
@@ -401,6 +417,22 @@ function Admission() {
         registrationRef,
         registrationData
       );
+
+      await setDoc(
+        doc(db, "studentProfiles", studentUser.uid),
+        {
+          registrationId:
+            generatedRegistrationId,
+          registrationDocId:
+            registrationRef.id,
+          studentUid:
+            studentUser.uid,
+          createdAt:
+            serverTimestamp(),
+        }
+      );
+
+      await logoutAdmin();
 
       /*
        * STEP 6
@@ -549,6 +581,19 @@ function Admission() {
                     registration status and download
                     your Student ID Card after approval.
                   </div>
+
+                  <a
+                    href="/student/login"
+                    style={{
+                      display: "inline-block",
+                      marginTop: "12px",
+                      color: "#2563eb",
+                      fontSize: "13px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    Student Login
+                  </a>
 
                 </div>
               )}
@@ -856,8 +901,12 @@ function Admission() {
                     Class 10
                   </option>
 
-                  <option value="Intermediate">
-                    Intermediate
+                  <option value="Class 11">
+                    Class 11
+                  </option>
+
+                  <option value="Class 12">
+                    Class 12
                   </option>
 
                 </select>
