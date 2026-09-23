@@ -8,50 +8,77 @@ service cloud.firestore {
     }
 
     match /registrations/{registrationId} {
-      allow create: if request.resource.data.keys().hasAll([
-        'registrationId',
-        'studentUid',
-        'studentName',
-        'fatherName',
-        'motherName',
-        'gender',
-        'dob',
-        'schoolName',
-        'className',
-        'medium',
-        'mobile',
-        'whatsapp',
-        'address',
-        'studentPhotoUrl',
-        'transactionNumber',
-        'paymentStatus',
-        'approvalStatus',
-        'createdAt'
-      ])
-      && request.resource.data.studentName is string
-      && request.resource.data.studentName.size() <= 100
-      && request.resource.data.studentUid == request.auth.uid
-      && request.resource.data.mobile is string
-      && request.resource.data.mobile.matches('^[0-9]{10}$')
-      && request.resource.data.whatsapp is string
-      && request.resource.data.whatsapp.matches('^[0-9]{10}$')
-      && request.resource.data.transactionNumber is string
-      && request.resource.data.transactionNumber.size() <= 100;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll([
+          'registrationId',
+          'studentUid',
+          'studentName',
+          'fatherName',
+          'motherName',
+          'gender',
+          'dob',
+          'schoolName',
+          'className',
+          'medium',
+          'email',
+          'mobile',
+          'whatsapp',
+          'address',
+          'studentPhotoUrl',
+          'transactionNumber',
+          'paymentStatus',
+          'approvalStatus',
+          'idCardStatus',
+          'idCardUrl',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.studentUid == request.auth.uid
+        && request.resource.data.registrationId is string
+        && request.resource.data.studentName is string
+        && request.resource.data.fatherName is string
+        && request.resource.data.motherName is string
+        && request.resource.data.gender is string
+        && request.resource.data.dob is string
+        && request.resource.data.schoolName is string
+        && request.resource.data.className is string
+        && request.resource.data.medium is string
+        && request.resource.data.mobile is string
+        && request.resource.data.mobile.matches('^[0-9]{10}$')
+        && request.resource.data.whatsapp is string
+        && request.resource.data.whatsapp.matches('^[0-9]{10}$')
+        && request.resource.data.studentPhotoUrl is string
+        && request.resource.data.transactionNumber is string
+        && request.resource.data.paymentStatus is string
+        && request.resource.data.approvalStatus is string
+        && request.resource.data.idCardStatus is string
+        && request.resource.data.idCardUrl is string
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
 
       allow get: if isAdmin() ||
         (request.auth != null &&
           resource.data.studentUid == request.auth.uid);
-      allow list, update, delete: if isAdmin();
+      allow list: if isAdmin();
+      allow update: if isAdmin() ||
+        (request.auth != null &&
+          resource.data.studentUid == request.auth.uid &&
+          request.resource.data.studentUid == request.auth.uid);
+      allow delete: if isAdmin();
     }
 
     match /studentProfiles/{studentUid} {
+      allow create: if request.auth != null &&
+        request.auth.uid == studentUid &&
+        request.resource.data.studentUid == studentUid &&
+        request.resource.data.registrationId is string &&
+        request.resource.data.createdAt is timestamp;
       allow get: if isAdmin() ||
         (request.auth != null && request.auth.uid == studentUid);
       allow list: if isAdmin();
-      allow create: if request.auth != null &&
-        request.auth.uid == studentUid &&
-        request.resource.data.studentUid == studentUid;
-      allow update, delete: if isAdmin();
+      allow update: if isAdmin() ||
+        (request.auth != null && request.auth.uid == studentUid);
+      allow delete: if isAdmin();
     }
 
     match /applications/{applicationId} {
@@ -88,8 +115,7 @@ service cloud.firestore {
 
     match /exams/{examId} {
       allow get, list: if isAdmin() ||
-        (request.auth != null &&
-          resource.data.status == 'Published');
+        (request.auth != null && resource.data.status == 'Published');
       allow create, update, delete: if isAdmin();
     }
 

@@ -353,48 +353,6 @@
 }
 
 /* ================================
-   PAYMENT
-================================ */
-
-.payment-notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 20px;
-  margin-bottom: 25px;
-  border: 1px solid #f1dfad;
-  border-radius: 12px;
-  background: #fffaf0;
-}
-
-.payment-icon {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: #f6d365;
-  color: #614900;
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.payment-notice h4 {
-  margin: 2px 0 6px;
-  color: #3b320f;
-  font-size: 15px;
-}
-
-.payment-notice p {
-  margin: 0;
-  color: #746b4c;
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-/* ================================
    SUBMIT
 ================================ */
 
@@ -558,10 +516,6 @@
 
   .photo-upload-content {
     align-items: center;
-  }
-
-  .payment-notice {
-    padding: 16px;
   }
 
   .registration-submit {

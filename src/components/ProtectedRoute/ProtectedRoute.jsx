@@ -4,6 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 
 import { auth } from "../../services/auth/authService";
+import BackButton from "../BackButton/BackButton";
 
 function ProtectedRoute({ children }) {
   const location = useLocation();
@@ -76,7 +77,15 @@ function ProtectedRoute({ children }) {
     );
   }
 
-  return children;
+  return (
+    <>
+      <BackButton
+        fallbackPath="/admin/dashboard"
+        variant="admin"
+      />
+      {children}
+    </>
+  );
 }
 
 export default ProtectedRoute;

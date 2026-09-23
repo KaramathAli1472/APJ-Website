@@ -21,6 +21,7 @@ import Gallery from "./pages/Gallery/Gallery";
 import Notices from "./pages/Notices/Notices";
 import FAQ from "./pages/FAQ/FAQ";
 import Contact from "./pages/Contact/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
 import StudentLogin from "./pages/StudentLogin/StudentLogin";
 import StudentDashboard from "./pages/StudentDashboard/StudentDashboard";
 
@@ -103,6 +104,11 @@ function App() {
           <Route
             path="/contact"
             element={<Contact />}
+          />
+
+          <Route
+            path="/privacy-policy"
+            element={<PrivacyPolicy />}
           />
 
           <Route

@@ -118,11 +118,6 @@ function StudentDashboard() {
         </article>
 
         <article>
-          <span>PAYMENT STATUS</span>
-          <strong>{registration.paymentStatus || "Pending"}</strong>
-        </article>
-
-        <article>
           <span>ID CARD</span>
           <strong>{registration.idCardStatus || "Not Generated"}</strong>
         </article>

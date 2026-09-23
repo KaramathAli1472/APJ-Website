@@ -30,7 +30,6 @@ function Admission() {
     whatsapp: "",
     address: "",
     studentPhoto: null,
-    transactionNumber: "",
   });
 
   const [photoPreview, setPhotoPreview] = useState("");
@@ -172,11 +171,6 @@ function Admission() {
         "Student photo is required.";
     }
 
-    if (!formData.transactionNumber.trim()) {
-      newErrors.transactionNumber =
-        "Transaction / UTR number is required.";
-    }
-
     setErrors(newErrors);
 
     return Object.keys(newErrors).length === 0;
@@ -255,7 +249,6 @@ function Admission() {
       whatsapp: "",
       address: "",
       studentPhoto: null,
-      transactionNumber: "",
     });
 
     setPhotoPreview("");
@@ -368,16 +361,15 @@ function Admission() {
         studentPhotoUrl:
           studentPhotoUrl,
 
-        transactionNumber:
-          formData.transactionNumber.trim(),
-
-        registrationFee:
-          200,
-
         /*
-         * Payment is not automatically verified.
-         * Admin will verify it manually.
+         * Payment is not completed at the initial
+         * registration stage, but the field is needed
+         * to satisfy the Firestore rules and downstream
+         * admin workflows.
          */
+
+        transactionNumber:
+          "",
 
         paymentStatus:
           "Pending",
@@ -529,8 +521,7 @@ function Admission() {
 
               <span>
                 Your registration has been received
-                and is currently pending payment
-                verification.
+                and is currently pending review.
               </span>
 
               {registrationId && (
@@ -604,9 +595,8 @@ function Admission() {
                 }}
               >
                 Your Student ID Card will be generated
-                only after your payment and registration
-                details are verified and approved by
-                the administration.
+                after your registration details are
+                verified and approved by the administration.
               </span>
 
             </div>
@@ -1169,290 +1159,13 @@ function Admission() {
 
             </div>
 
-            {/* 05 */}
-
-            <div className="form-section-title">
-
-              <span>
-                05
-              </span>
-
-              <div>
-
-                <h3>
-                  Registration Payment
-                </h3>
-
-                <p>
-                  Complete the registration payment
-                  before submitting your application.
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* PAYMENT CARD */}
-
-            <div className="payment-card">
-
-              <div className="payment-card-top">
-
-                <div className="payment-card-title">
-
-                  <div className="payment-icon">
-                    ₹
-                  </div>
-
-                  <div>
-
-                    <span>
-                      REGISTRATION FEE
-                    </span>
-
-                    <h3>
-                      Payment Information
-                    </h3>
-
-                  </div>
-
-                </div>
-
-                <div className="payment-amount">
-                  ₹200
-                </div>
-
-              </div>
-
-              <div className="payment-card-body">
-
-                <p className="payment-description">
-
-                  Please complete the registration
-                  payment of
-                  <strong> ₹200 </strong>
-                  using the bank details provided
-                  below. After making the payment,
-                  enter your transaction or UTR
-                  number in the form.
-
-                </p>
-
-                {/* BANK DETAILS */}
-
-                <div className="bank-details">
-
-                  <div className="bank-details-heading">
-                    Bank Transfer Details
-                  </div>
-
-                  <div className="bank-detail-row">
-
-                    <span>
-                      Bank Name
-                    </span>
-
-                    <strong>
-                      Canara Bank
-                    </strong>
-
-                  </div>
-
-                  <div className="bank-detail-row">
-
-                    <span>
-                      Branch
-                    </span>
-
-                    <strong>
-                      Kanchanbagh Branch
-                    </strong>
-
-                  </div>
-
-                  <div className="bank-detail-row">
-
-                    <span>
-                      Account Number
-                    </span>
-
-                    <strong className="account-number">
-                      1849201000767
-                    </strong>
-
-                  </div>
-
-                  <div className="bank-detail-row">
-
-                    <span>
-                      IFSC Code
-                    </span>
-
-                    <strong>
-                      CNRB0001849
-                    </strong>
-
-                  </div>
-
-                </div>
-
-                {/* PAYMENT STEPS */}
-
-                <div className="payment-steps">
-
-                  <div className="payment-step">
-
-                    <div className="step-number">
-                      01
-                    </div>
-
-                    <div>
-
-                      <h4>
-                        Make Payment
-                      </h4>
-
-                      <p>
-                        Transfer ₹200 to the bank
-                        account mentioned above.
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div className="payment-step">
-
-                    <div className="step-number">
-                      02
-                    </div>
-
-                    <div>
-
-                      <h4>
-                        Enter Transaction Number
-                      </h4>
-
-                      <p>
-                        Enter the transaction or UTR
-                        number shown on your receipt.
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div className="payment-step">
-
-                    <div className="step-number">
-                      03
-                    </div>
-
-                    <div>
-
-                      <h4>
-                        Payment Verification
-                      </h4>
-
-                      <p>
-                        Our administration will verify
-                        your payment before approval.
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* IMPORTANT INFORMATION */}
-
-            <div className="payment-important">
-
-              <div className="payment-important-icon">
-                ✓
-              </div>
-
-              <div>
-
-                <h4>
-                  Important Information
-                </h4>
-
-                <p>
-                  Your registration will remain under
-                  <strong>
-                    {" "}Pending Verification{" "}
-                  </strong>
-                  until the payment has been verified
-                  by the administration.
-                </p>
-
-                <p>
-                  Once your payment and registration
-                  details are successfully verified
-                  and approved, your
-                  <strong>
-                    {" "}Student ID Card will be
-                    generated{" "}
-                  </strong>
-                  and made available for download.
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* TRANSACTION */}
-
-            <div className="form-group payment-transaction-field">
-
-              <label htmlFor="transactionNumber">
-
-                Transaction / UTR Number
-
-                <span>*</span>
-
-              </label>
-
-              <input
-                id="transactionNumber"
-                type="text"
-                name="transactionNumber"
-                value={
-                  formData.transactionNumber
-                }
-                onChange={handleChange}
-                placeholder="Enter your transaction / UTR number"
-              />
-
-              {errors.transactionNumber && (
-                <small>
-                  {errors.transactionNumber}
-                </small>
-              )}
-
-              <p className="field-help">
-                Please enter the transaction number
-                exactly as shown in your bank or
-                payment receipt.
-              </p>
-
-            </div>
-
             {/* SUBMIT */}
 
             <div className="registration-submit">
 
               <p>
                 By submitting this form, you confirm
-                that the information provided is
-                correct and that the payment details
-                entered by you are genuine.
+                that the information provided is correct.
               </p>
 
               <button

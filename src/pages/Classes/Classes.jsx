@@ -7,7 +7,6 @@ import classesData from "../../data/classes/classesData";
 import {
   collection,
   getDocs,
-  orderBy,
   query,
   where,
 } from "firebase/firestore";
@@ -24,16 +23,26 @@ function Classes() {
   useEffect(() => {
     const classesQuery = query(
       collection(db, "classes"),
-      where("status", "==", "Active"),
-      orderBy("createdAt", "desc")
+      where("status", "==", "Active")
     );
 
     getDocs(classesQuery)
       .then((snapshot) => {
-        const firebaseClasses = snapshot.docs.map((item) => ({
-          id: item.id,
-          ...item.data(),
-        }));
+        const firebaseClasses = snapshot.docs
+          .map((item) => ({
+            id: item.id,
+            ...item.data(),
+          }))
+          .sort((first, second) => {
+            const firstTime = first.createdAt?.toMillis
+              ? first.createdAt.toMillis()
+              : new Date(first.createdAt || 0).getTime();
+            const secondTime = second.createdAt?.toMillis
+              ? second.createdAt.toMillis()
+              : new Date(second.createdAt || 0).getTime();
+
+            return secondTime - firstTime;
+          });
 
         setClasses(firebaseClasses);
         setErrorMessage("");

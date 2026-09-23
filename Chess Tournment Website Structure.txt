@@ -1,0 +1,588 @@
+Bilkul. APJ Chess Tournament ke liye main aapko ek complete structure de raha hoon, jisse hum project ko step-by-step build kar sakte hain. Isko aise design karenge ki abhi small/free usage mein chale aur future mein expand bhi ho sake.
+
+♟️ APJ Chess Tournament — Complete Structure
+1. 🏠 Public Website
+/
+├── Home
+├── About Tournament
+├── Upcoming Tournaments
+├── Live Tournament
+├── Rankings
+├── Winners
+├── Rules
+├── Contact
+├── Login
+└── Register
+Home Page
+APJ Chess Tournament
+"Play • Compete • Improve"
+
+[Join Tournament] [Play Chess]
+
+Upcoming Tournament
+├── Tournament Name
+├── Date
+├── Players
+├── Status
+└── [View Tournament]
+
+Live Tournament
+├── Current Round
+├── Live Matches
+└── [Watch / Play]
+
+Top Players
+├── Rank
+├── Player
+└── Points
+2. 👤 Student System
+
+Student registration:
+
+Student Registration
+
+Full Name
+Date of Birth
+Gender
+Mobile Number
+Email
+Password
+Profile Photo
+Student ID
+Chess Rating
+
+Login ke baad:
+
+Student Dashboard
+│
+├── My Profile
+├── My Tournaments
+├── Upcoming Match
+├── Live Match
+├── Match History
+├── My Ranking
+├── Certificates
+└── Logout
+3. 🏆 Tournament System
+
+Admin tournament create karega:
+
+Create Tournament
+
+Tournament Name
+Description
+Start Date
+End Date
+Registration Start
+Registration End
+
+Tournament Type
+→ Swiss
+
+Number of Rounds
+→ 5 / 7 / Custom
+
+Time Control
+→ 10 min
+→ 15 min
+→ 10 + 5
+→ Custom
+
+Maximum Players
+Entry Fee
+Tournament Rules
+
+Tournament page:
+
+APJ Chess Tournament
+
+Status: LIVE
+
+Players: 48
+Round: 3 / 5
+
+[Standings]
+[Pairings]
+[Live Games]
+[Results]
+[Rules]
+4. ♟️ Automatic Pairing
+
+Ye project ka important part hoga.
+
+Admin:
+
+Start Round
+
+press karega.
+
+System automatically:
+
+Registered Students
+        ↓
+Check Previous Matches
+        ↓
+Check Points
+        ↓
+Swiss Pairing
+        ↓
+Generate Matches
+        ↓
+Assign Board
+        ↓
+Notify Students
+
+Student ko opponent choose nahi karna padega.
+
+Example:
+
+Round 2
+
+Board 1
+Rahul vs Aman
+
+Board 2
+Arjun vs Sameer
+
+Board 3
+Rohit vs Ali
+
+Board 4
+Vikas vs Karan
+5. ♟️ Live Chess
+
+Student ko dashboard par:
+
+YOUR MATCH
+
+Board #12
+
+White
+Rahul
+
+VS
+
+Black
+Aman
+
+Time
+09:32
+
+[ CHESS BOARD ]
+
+Resign
+Draw
+Important
+
+Move server par validate hoga.
+
+Player Move
+     ↓
+Server Validation
+     ↓
+Save Move
+     ↓
+Realtime Update
+     ↓
+Opponent Screen
+
+Isse illegal moves directly database mein insert nahi honge.
+
+6. ⏱️ Chess Clock
+
+Example:
+
+WHITE              BLACK
+
+09:42              09:51
+
+        ♟️
+     CHESS BOARD
+
+Time control:
+
+5+0
+10+0
+10+5
+15+10
+Custom
+
+Game automatically end ho sakta hai:
+
+Checkmate
+Time Out
+Resignation
+Draw
+Stalemate
+Threefold Repetition
+Insufficient Material
+7. 📊 Standings / Ranking
+
+Tournament ke andar:
+
+Rank | Player | Played | Win | Draw | Loss | Points
+----------------------------------------------------
+1    | Rahul  | 5      | 4   | 1    | 0    | 4.5
+2    | Aman   | 5      | 4   | 0    | 1    | 4
+3    | Arjun  | 5      | 3   | 1    | 1    | 3.5
+
+Points automatically calculate honge:
+
+Win  = 1
+Draw = 0.5
+Loss = 0
+
+Tie-break system bhi add kar sakte hain.
+
+8. 📜 Match History
+
+Student:
+
+My Matches
+
+Round 1
+Rahul vs Aman
+Result: WIN
++1 Point
+
+Round 2
+Rahul vs Arjun
+Result: DRAW
++0.5 Point
+
+Round 3
+Rahul vs Sameer
+Result: LOSS
++0 Point
+
+Aur har game ka move history bhi save kar sakte hain.
+
+9. 🏅 Tournament Results
+
+Tournament complete hone ke baad:
+
+🏆 APJ Chess Tournament
+
+Winner
+🥇 Rahul
+
+Second
+🥈 Aman
+
+Third
+🥉 Arjun
+
+[View Full Ranking]
+[Download Certificate]
+10. 📜 Certificate System
+
+System automatically certificate generate karega.
+
+APJ Chess Tournament
+
+Certificate of Achievement
+
+This certificate is proudly presented to
+
+       RAHUL KUMAR
+
+for securing
+
+          1st Place
+
+in APJ Chess Tournament
+
+Date: __________
+
+Authorized By
+APJ Chess Tournament
+
+PDF download option bhi rakhenge.
+
+11. 👨‍💼 Admin Panel
+
+Admin login ke baad:
+
+ADMIN DASHBOARD
+
+Overview
+│
+├── Students
+├── Tournaments
+├── Registrations
+├── Pairings
+├── Live Matches
+├── Results
+├── Rankings
+├── Certificates
+└── Settings
+Dashboard
+Total Students      245
+Active Tournament     2
+Live Matches         12
+Completed Games     584
+12. 👥 Student Management
+
+Admin:
+
+Students
+
+Search Student
+Filter
+Sort
+
+Name | Email | Rating | Games | Status
+
+Rahul | ... | 1200 | 25 | Active
+Aman  | ... | 1350 | 31 | Active
+
+Admin student ko:
+
+View
+Edit
+Disable
+Delete
+Reset account
+
+kar sakega.
+
+13. 🏆 Tournament Management
+
+Admin:
+
+Tournaments
+
+Create Tournament
+
+APJ September Championship
+Status: Registration
+
+APJ October Championship
+Status: Upcoming
+
+APJ Weekly Tournament
+Status: Completed
+
+Tournament controls:
+
+Open Registration
+Close Registration
+Start Tournament
+Start Round
+Pause Round
+Complete Round
+Complete Tournament
+14. 📢 Notifications
+
+Student ko notification:
+
+🔔 New Match
+
+Your Round 3 match is ready.
+
+Rahul vs Aman
+Board #4
+
+[Play Now]
+
+Aur:
+
+Tournament starting
+New round
+Match result
+Certificate available
+
+jaise notifications.
+
+15. 🔐 Security
+
+Ye bahut important hai.
+
+Student:
+
+❌ Apna result change nahi kar sakta
+❌ Opponent change nahi kar sakta
+❌ Points change nahi kar sakta
+❌ Illegal chess move save nahi kar sakta
+❌ Dusre student ka private data nahi dekh sakta
+
+Admin:
+
+✅ Tournament manage
+✅ Students manage
+✅ Pairing control
+✅ Results manage
+
+Database security rules properly set karenge.
+
+16. 🗄️ Database Structure
+
+Supabase PostgreSQL mein main roughly ye tables rakhunga:
+
+users
+│
+├── student_profiles
+│
+├── tournaments
+│
+├── tournament_players
+│
+├── rounds
+│
+├── matches
+│
+├── chess_moves
+│
+├── game_results
+│
+├── standings
+│
+├── certificates
+│
+└── notifications
+Important relationships
+Student
+   │
+   ├── Tournament Registration
+   │          │
+   │          └── Tournament
+   │
+   └── Matches
+             │
+             └── Chess Moves
+17. 🛠️ Technology Structure
+APJ Chess Tournament
+│
+├── Next.js
+│
+├── TypeScript
+│
+├── Tailwind CSS
+│
+├── Supabase
+│   ├── PostgreSQL
+│   ├── Auth
+│   ├── Realtime
+│   └── Storage
+│
+├── chess.js
+│
+├── React Chessboard
+│
+└── Cloudflare Pages
+18. 📁 Project Folder Structure
+apj-chess-tournament/
+│
+├── app/
+│   ├── page.tsx
+│   ├── login/
+│   ├── register/
+│   ├── dashboard/
+│   ├── tournaments/
+│   ├── games/
+│   ├── rankings/
+│   ├── certificates/
+│   └── admin/
+│
+├── components/
+│   ├── ChessBoard/
+│   ├── ChessClock/
+│   ├── TournamentCard/
+│   ├── PlayerCard/
+│   ├── StandingsTable/
+│   └── Navbar/
+│
+├── lib/
+│   ├── supabase/
+│   ├── chess/
+│   ├── pairing/
+│   └── auth/
+│
+├── types/
+│
+├── utils/
+│
+└── public/
+🚀 Development Order
+
+Hum sab kuch ek saath nahi banayenge. Is order mein build karna best rahega:
+
+Phase 1 — Foundation
+Next.js setup
+Cloudflare setup
+Supabase setup
+Database
+Authentication
+Phase 2 — Student
+Registration
+Login
+Dashboard
+Profile
+Phase 3 — Tournament
+Tournament creation
+Registration
+Player list
+Swiss pairing
+Phase 4 — Chess
+Chess board
+Chess rules
+Chess clock
+Live moves
+Result
+Phase 5 — Ranking
+Points
+Standings
+Tie-break
+Match history
+Phase 6 — Admin
+Admin dashboard
+Tournament controls
+Student management
+Results management
+Phase 7 — Certificate
+Automatic certificate
+PDF generation
+Phase 8 — Testing & Security
+Mobile responsive
+Security rules
+Cheating prevention
+Disconnect/reconnect
+Load testing
+🎯 Final Architecture
+                 APJ CHESS TOURNAMENT
+                         │
+             ┌───────────┴───────────┐
+             │                       │
+         STUDENT                   ADMIN
+             │                       │
+             ▼                       ▼
+       Login/Register          Admin Dashboard
+             │                       │
+             ▼                       ▼
+        Tournament ◄────────► Management
+             │
+             ▼
+     Automatic Swiss Pairing
+             │
+             ▼
+       ┌───────────────┐
+       │  LIVE CHESS   │
+       │ A  vs  B      │
+       └───────────────┘
+             │
+             ▼
+          Result
+             │
+             ▼
+      Points + Ranking
+             │
+             ▼
+       Next Round
+             │
+             ▼
+       Final Results
+             │
+             ▼
+        Certificate
+
+Ye hamara master structure rahega. Iske baad hum coding start kar sakte hain—pehla practical step Supabase project create karke database tables/SQL banana hoga.

@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import {
   collection,
   getDocs,
-  orderBy,
   query,
   where,
 } from "firebase/firestore";
@@ -14,14 +13,13 @@ import "./Syllabus.css";
 import { db } from "../../services/firestore/firestoreService";
 
 function Syllabus() {
-  const [syllabusData, setSyllabusData] =
-    useState([]);
+  const [syllabusData, setSyllabusData] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [errorMessage, setErrorMessage] =
-    useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [selectedClass, setSelectedClass] = useState(null);
 
   useEffect(() => {
     const loadSyllabus = async () => {
@@ -35,30 +33,31 @@ function Syllabus() {
          */
         const syllabusQuery = query(
           collection(db, "syllabus"),
-          where("status", "==", "Published"),
-          orderBy("createdAt", "desc")
+          where("status", "==", "Published")
         );
 
-        const snapshot =
-          await getDocs(syllabusQuery);
+        const snapshot = await getDocs(syllabusQuery);
 
-        const data = snapshot.docs.map((item) => ({
-          id: item.id,
-          ...item.data(),
-        }));
+        const data = snapshot.docs
+          .map((item) => ({
+            id: item.id,
+            ...item.data(),
+          }))
+          .sort((first, second) => {
+            const firstTime = first.createdAt?.toMillis
+              ? first.createdAt.toMillis()
+              : new Date(first.createdAt || 0).getTime();
+            const secondTime = second.createdAt?.toMillis
+              ? second.createdAt.toMillis()
+              : new Date(second.createdAt || 0).getTime();
+
+            return secondTime - firstTime;
+          });
 
         setSyllabusData(data);
       } catch (error) {
-        console.error(
-          "Syllabus loading error:",
-          error
-        );
+        console.error("Syllabus loading error:", error);
 
-        /*
-         * Agar composite index ki zarurat ho,
-         * Firebase console ka error yahan console
-         * mein clearly show hoga.
-         */
         setErrorMessage(
           "Unable to load syllabus information right now."
         );
@@ -75,141 +74,134 @@ function Syllabus() {
   /*
    * Group syllabus documents by class.
    */
-  const groupedClasses =
-    syllabusData.reduce(
-      (groups, item) => {
-        const className =
-          item.className ||
-          item.class ||
-          "";
+  const groupedClasses = syllabusData.reduce(
+    (groups, item) => {
+      const className =
+        item.className ||
+        item.class ||
+        "";
 
-        const subject =
-          item.subject ||
-          "";
+      const subject =
+        item.subject ||
+        "";
 
-        if (!className) {
-          return groups;
-        }
-
-        if (!groups[className]) {
-          groups[className] = {
-            className,
-            subjects: [],
-            topics: [],
-          };
-        }
-
-        if (
-          subject &&
-          !groups[className].subjects.includes(
-            subject
-          )
-        ) {
-          groups[className].subjects.push(
-            subject
-          );
-        }
-
-        groups[className].topics.push(item);
-
+      if (!className) {
         return groups;
-      },
-      {}
-    );
+      }
+
+      if (!groups[className]) {
+        groups[className] = {
+          className,
+          subjects: [],
+          topics: [],
+        };
+      }
+
+      /*
+       * Award & Scholarship Test ke liye
+       * sirf Mathematics aur Science.
+       */
+      if (
+        subject &&
+        ["Mathematics", "Science"].includes(subject) &&
+        !groups[className].subjects.includes(subject)
+      ) {
+        groups[className].subjects.push(subject);
+      }
+
+      /*
+       * Sirf Mathematics aur Science syllabus
+       * resources mein show hoga.
+       */
+      if (
+        ["Mathematics", "Science"].includes(subject)
+      ) {
+        groups[className].topics.push(item);
+      }
+
+      return groups;
+    },
+    {}
+  );
 
   /*
    * Convert grouped object into array
    * and sort classes numerically.
    */
-  const classes = Object.values(
-    groupedClasses
-  ).sort((a, b) => {
-    const numberA = parseInt(
-      a.className.replace(/\D/g, ""),
-      10
-    );
+  const classes = Object.values(groupedClasses).sort(
+    (a, b) => {
+      const numberA = parseInt(
+        a.className.replace(/\D/g, ""),
+        10
+      );
 
-    const numberB = parseInt(
-      b.className.replace(/\D/g, ""),
-      10
-    );
+      const numberB = parseInt(
+        b.className.replace(/\D/g, ""),
+        10
+      );
 
-    if (Number.isNaN(numberA)) {
-      return 1;
+      if (Number.isNaN(numberA)) {
+        return 1;
+      }
+
+      if (Number.isNaN(numberB)) {
+        return -1;
+      }
+
+      return numberA - numberB;
     }
-
-    if (Number.isNaN(numberB)) {
-      return -1;
-    }
-
-    return numberA - numberB;
-  });
+  );
 
   /*
    * Default class structure.
+   *
+   * Class 4 to Class 12
+   * Only Mathematics + Science.
    */
   const defaultClasses = [
     {
       className: "Class 4",
-      subjects: [
-        "Mathematics",
-        "Science",
-        "English",
-      ],
+      subjects: ["Mathematics", "Science"],
       topics: [],
     },
     {
       className: "Class 5",
-      subjects: [
-        "Mathematics",
-        "Science",
-        "English",
-      ],
+      subjects: ["Mathematics", "Science"],
       topics: [],
     },
     {
       className: "Class 6",
-      subjects: [
-        "Mathematics",
-        "Science",
-        "English",
-      ],
+      subjects: ["Mathematics", "Science"],
       topics: [],
     },
     {
       className: "Class 7",
-      subjects: [
-        "Mathematics",
-        "Science",
-        "English",
-      ],
+      subjects: ["Mathematics", "Science"],
       topics: [],
     },
     {
       className: "Class 8",
-      subjects: [
-        "Mathematics",
-        "Science",
-        "English",
-      ],
+      subjects: ["Mathematics", "Science"],
       topics: [],
     },
     {
       className: "Class 9",
-      subjects: [
-        "Mathematics",
-        "Science",
-        "English",
-      ],
+      subjects: ["Mathematics", "Science"],
       topics: [],
     },
     {
       className: "Class 10",
-      subjects: [
-        "Mathematics",
-        "Science",
-        "English",
-      ],
+      subjects: ["Mathematics", "Science"],
+      topics: [],
+    },
+    {
+      className: "Class 11",
+      subjects: ["Mathematics", "Science"],
+      topics: [],
+    },
+    {
+      className: "Class 12",
+      subjects: ["Mathematics", "Science"],
       topics: [],
     },
   ];
@@ -223,9 +215,24 @@ function Syllabus() {
       ? classes
       : defaultClasses;
 
+  const selectedClassTopics = selectedClass
+    ? syllabusData.filter((item) => {
+        const className =
+          item.className ||
+          item.class ||
+          "";
+
+        return (
+          className === selectedClass.className &&
+          ["Mathematics", "Science"].includes(
+            item.subject
+          )
+        );
+      })
+    : [];
+
   const getClassNumber = (className) => {
-    const number =
-      className.match(/\d+/);
+    const number = className.match(/\d+/);
 
     return number
       ? number[0]
@@ -243,7 +250,7 @@ function Syllabus() {
         <div className="syllabus-container">
 
           <span className="syllabus-hero-label">
-            ACADEMIC RESOURCES
+            ALL INDIA BRIGHT STUDENT AWARD & SCHOLARSHIP TEST
           </span>
 
           <h1>
@@ -252,9 +259,9 @@ function Syllabus() {
           </h1>
 
           <p>
-            Find academic subjects and syllabus
-            information for students from Class 4
-            to Class 12.
+            Explore the Mathematics and Science syllabus
+            for students from Class 4 to Class 12,
+            designed around their school curriculum.
           </p>
 
         </div>
@@ -275,12 +282,15 @@ function Syllabus() {
             </span>
 
             <h2>
-              Academic Syllabus
+              Award & Scholarship Test Syllabus
             </h2>
 
             <p>
-              Select your class to explore the available
-              subjects and academic resources.
+              Select your class to explore the
+              Mathematics and Science syllabus.
+              The examination is based on the student's
+              own school syllabus with conceptual,
+              application-based and higher-order questions.
             </p>
 
           </div>
@@ -308,23 +318,21 @@ function Syllabus() {
               ERROR
           ================================================= */}
 
-          {!loading &&
-            errorMessage && (
-              <div
-                style={{
-                  marginBottom: "30px",
-                  padding: "16px 18px",
-                  borderRadius: "12px",
-                  background: "#fef2f2",
-                  color: "#b91c1c",
-                  border:
-                    "1px solid #fecaca",
-                  fontSize: "14px",
-                }}
-              >
-                ⚠ {errorMessage}
-              </div>
-            )}
+          {!loading && errorMessage && (
+            <div
+              style={{
+                marginBottom: "30px",
+                padding: "16px 18px",
+                borderRadius: "12px",
+                background: "#fef2f2",
+                color: "#b91c1c",
+                border: "1px solid #fecaca",
+                fontSize: "14px",
+              }}
+            >
+              ⚠ {errorMessage}
+            </div>
+          )}
 
 
           {/* =================================================
@@ -343,9 +351,7 @@ function Syllabus() {
                   <div className="syllabus-card-top">
 
                     <div className="syllabus-class-number">
-                      {getClassNumber(
-                        item.className
-                      )}
+                      {getClassNumber(item.className)}
                     </div>
 
                     <span>
@@ -367,7 +373,6 @@ function Syllabus() {
                         [
                           "Mathematics",
                           "Science",
-                          "English",
                         ].includes(subject)
                       )
                       .map((subject) => (
@@ -404,26 +409,27 @@ function Syllabus() {
                     type="button"
                     className="syllabus-view-button"
                     onClick={() => {
-                      const firstTopic =
-                        item.topics[0];
+                      setSelectedClass(item);
 
-                      if (firstTopic?.id) {
+                      window.setTimeout(() => {
                         const element =
                           document.getElementById(
-                            `syllabus-${firstTopic.id}`
+                            "syllabus-topics"
                           );
 
                         if (element) {
                           element.scrollIntoView({
-                            behavior:
-                              "smooth",
-                            block: "center",
+                            behavior: "smooth",
+                            block: "start",
                           });
                         }
-                      }
+                      }, 0);
                     }}
                   >
-                    View Syllabus →
+                    {selectedClass?.className ===
+                    item.className
+                      ? "Selected"
+                      : "View Syllabus →"}
                   </button>
 
                 </div>
@@ -441,24 +447,29 @@ function Syllabus() {
       ================================================= */}
 
       {!loading &&
+        selectedClass &&
         syllabusData.length > 0 && (
           <section className="syllabus-resources">
 
             <div className="syllabus-container">
 
-              <div className="syllabus-heading">
+              <div
+                className="syllabus-heading"
+                id="syllabus-topics"
+              >
 
                 <span className="syllabus-section-label">
                   SYLLABUS TOPICS
                 </span>
 
                 <h2>
-                  Available Academic Topics
+                  {selectedClass.className} Syllabus
                 </h2>
 
                 <p>
-                  Explore the syllabus topics currently
-                  published by APJ EDU.
+                  Explore the detailed Mathematics and
+                  Science syllabus currently published
+                  by APJ EDU.
                 </p>
 
               </div>
@@ -466,56 +477,74 @@ function Syllabus() {
 
               <div className="resource-grid">
 
-                {syllabusData.map((item) => (
-                  <div
-                    className="resource-card"
-                    id={`syllabus-${item.id}`}
-                    key={item.id}
-                  >
-
-                    <div className="resource-icon">
-                      📚
-                    </div>
-
-                    <h3>
-                      {item.title ||
-                        "Syllabus Topic"}
-                    </h3>
-
-                    <p>
-                      {item.description ||
-                        `${
-                          item.subject ||
-                          "Academic"
-                        } syllabus topic for ${
-                          item.className ||
-                          item.class ||
-                          "students"
-                        }.`}
-                    </p>
-
+                {selectedClassTopics.map((item) => (
                     <div
-                      style={{
-                        marginTop: "14px",
-                        color: "#1b63a8",
-                        fontSize: "13px",
-                        fontWeight: "700",
-                      }}
+                      className="resource-card"
+                      id={`syllabus-${item.id}`}
+                      key={item.id}
                     >
-                      {item.className ||
-                        item.class ||
-                        "Class"}
 
-                      {" • "}
+                      <div className="resource-icon">
+                        📚
+                      </div>
 
-                      {item.subject ||
-                        "Subject"}
+
+                      <h3>
+                        {item.title ||
+                          `Complete ${
+                            item.subject ||
+                            "Academic"
+                          } Syllabus`}
+                      </h3>
+
+
+                      {item.description ? (
+                        <div
+                          className="syllabus-description"
+                        >
+                          {item.description}
+                        </div>
+                      ) : (
+                        <p>
+                          {item.subject ||
+                            "Academic"}{" "}
+                          syllabus for{" "}
+                          {item.className ||
+                            item.class ||
+                            "students"}.
+                        </p>
+                      )}
+
+
+                      <div
+                        style={{
+                          marginTop: "18px",
+                          color: "#1b63a8",
+                          fontSize: "13px",
+                          fontWeight: "700",
+                        }}
+                      >
+                        {item.className ||
+                          item.class ||
+                          "Class"}
+
+                        {" • "}
+
+                        {item.subject ||
+                          "Subject"}
+                      </div>
+
                     </div>
-
-                  </div>
-                ))}
+                  ))}
 
               </div>
+
+              {selectedClassTopics.length === 0 && (
+                <p className="syllabus-empty-state">
+                  Detailed syllabus for {selectedClass.className} is
+                  not available yet.
+                </p>
+              )}
 
             </div>
 
@@ -542,8 +571,9 @@ function Syllabus() {
             </h2>
 
             <p>
-              APJ EDU can provide students with useful
-              academic resources in one place.
+              APJ EDU provides students with useful
+              academic resources to support their
+              preparation.
             </p>
 
           </div>
@@ -599,7 +629,7 @@ function Syllabus() {
 
               <p>
                 Practice resources can help students
-                strengthen their understanding.
+                strengthen their conceptual understanding.
               </p>
 
             </div>
@@ -626,12 +656,13 @@ function Syllabus() {
             </span>
 
             <h2>
-              Find Your Class & Start Exploring
+              Find Your Class & Start Preparing
             </h2>
 
             <p>
-              Explore the available academic sections
-              and discover useful resources.
+              Explore the syllabus for your class and
+              prepare for the All India Bright Student
+              Award & Scholarship Test.
             </p>
 
           </div>

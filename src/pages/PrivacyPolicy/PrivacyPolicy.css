@@ -1,0 +1,156 @@
+.privacy-page {
+  width: 100%;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.privacy-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.privacy-hero {
+  padding: 68px 20px 62px;
+  background:
+    linear-gradient(135deg, #0b1f3a 0%, #12345b 55%, #1769aa 100%);
+  color: #ffffff;
+}
+
+.privacy-hero-badge {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #93c5fd;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.privacy-hero h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1.1;
+}
+
+.privacy-hero p {
+  max-width: 680px;
+  margin: 20px 0 0;
+  color: #dbeafe;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.privacy-content {
+  padding: 60px 20px 80px;
+}
+
+.privacy-updated {
+  margin: 0 0 30px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.privacy-section {
+  margin-bottom: 34px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.privacy-section h2 {
+  margin: 0 0 12px;
+  color: #0f172a;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.privacy-section p,
+.privacy-section li {
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.privacy-section p {
+  margin: 0 0 14px;
+}
+
+.privacy-section p:last-child {
+  margin-bottom: 0;
+}
+
+.privacy-section ul {
+  margin: 10px 0 0;
+  padding-left: 22px;
+}
+
+.privacy-section li + li {
+  margin-top: 6px;
+}
+
+.privacy-highlight {
+  padding: 26px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #eff6ff;
+}
+
+.privacy-highlight h2 {
+  color: #12345b;
+}
+
+.privacy-highlight p {
+  color: #334e68;
+}
+
+.privacy-section a {
+  color: #1769aa;
+  font-weight: 700;
+}
+
+.privacy-home-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: #1769aa;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.privacy-home-link:hover {
+  background: #0b4f86;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .privacy-hero {
+    padding: 54px 20px 48px;
+  }
+
+  .privacy-hero p {
+    font-size: 14px;
+  }
+
+  .privacy-content {
+    padding: 45px 20px 60px;
+  }
+
+  .privacy-section h2 {
+    font-size: 20px;
+  }
+
+  .privacy-section p,
+  .privacy-section li {
+    font-size: 14px;
+  }
+
+  .privacy-highlight {
+    padding: 21px;
+  }
+}

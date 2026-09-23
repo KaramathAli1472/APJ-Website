@@ -11,7 +11,9 @@
   padding-right: 20px;
 }
 
-/* Hero */
+/* =================================================
+   HERO
+================================================= */
 
 .syllabus-hero {
   position: relative;
@@ -60,6 +62,7 @@
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 2px;
+  line-height: 1.6;
 }
 
 .syllabus-hero h1 {
@@ -84,7 +87,9 @@
   line-height: 1.8;
 }
 
-/* Common Heading */
+/* =================================================
+   COMMON HEADING
+================================================= */
 
 .syllabus-heading {
   max-width: 720px;
@@ -115,7 +120,9 @@
   line-height: 1.8;
 }
 
-/* Syllabus Section */
+/* =================================================
+   SYLLABUS SECTION
+================================================= */
 
 .syllabus-intro {
   padding: 72px 20px;
@@ -200,6 +207,10 @@
   font-weight: 800;
 }
 
+/* =================================================
+   SYLLABUS VIEW BUTTON
+================================================= */
+
 .syllabus-view-button {
   width: 100%;
   min-height: 43px;
@@ -222,7 +233,9 @@
   transform: translateY(-1px);
 }
 
-/* Resources */
+/* =================================================
+   RESOURCES
+================================================= */
 
 .syllabus-resources {
   padding: 72px 20px;
@@ -268,6 +281,7 @@
   margin: 0 0 10px;
   color: #0f172a;
   font-size: 20px;
+  line-height: 1.4;
 }
 
 .resource-card p {
@@ -277,7 +291,52 @@
   line-height: 1.75;
 }
 
-/* CTA */
+/* =================================================
+   DETAILED SYLLABUS DESCRIPTION
+================================================= */
+
+/*
+ * Firebase ke Description field mein agar:
+ *
+ * 1. Number System
+ *    - Place value
+ *    - Face value
+ *
+ * 2. Addition
+ *    - Addition of numbers
+ *
+ * likha hua hai, to white-space: pre-wrap
+ * usi formatting ko website par preserve karega.
+ */
+
+.syllabus-description {
+  margin-top: 18px;
+  color: #475467;
+  font-size: 14px;
+  line-height: 1.8;
+
+  /* Firebase line breaks + spaces preserve */
+  white-space: pre-wrap;
+
+  /* Long words/text mobile par overflow na kare */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  /* Better readability */
+  text-align: left;
+}
+
+/*
+ * Description ke andar numbered topics ko
+ * readable spacing dene ke liye.
+ */
+.syllabus-description::first-line {
+  font-weight: 500;
+}
+
+/* =================================================
+   CTA
+================================================= */
 
 .syllabus-cta {
   padding: 70px 20px;
@@ -342,7 +401,9 @@
   transform: translateY(-2px);
 }
 
-/* Tablet */
+/* =================================================
+   TABLET
+================================================= */
 
 @media (max-width: 950px) {
   .syllabus-grid {
@@ -354,11 +415,18 @@
   }
 }
 
-/* Mobile */
+/* =================================================
+   MOBILE
+================================================= */
 
 @media (max-width: 650px) {
   .syllabus-hero {
     padding: 56px 20px 52px;
+  }
+
+  .syllabus-hero-label {
+    font-size: 10px;
+    letter-spacing: 1.4px;
   }
 
   .syllabus-hero h1 {
@@ -387,6 +455,11 @@
     grid-template-columns: 1fr;
   }
 
+  .syllabus-description {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
   .syllabus-cta {
     padding: 55px 20px;
   }
@@ -401,6 +474,10 @@
   }
 }
 
+/* =================================================
+   SMALL MOBILE
+================================================= */
+
 @media (max-width: 420px) {
   .syllabus-hero h1 {
     font-size: 2.15rem;
@@ -409,5 +486,15 @@
   .syllabus-card,
   .resource-card {
     padding: 24px 20px;
+  }
+
+  .syllabus-class-number {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .syllabus-description {
+    font-size: 13px;
   }
 }

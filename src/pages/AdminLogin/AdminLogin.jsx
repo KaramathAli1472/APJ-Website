@@ -3,6 +3,7 @@ import societyLogo from "../../assets/logo/logo.png.jpeg";
 import { Link, useNavigate } from "react-router-dom";
 
 import { loginAdmin } from "../../services/auth/authService";
+import BackButton from "../../components/BackButton/BackButton";
 
 import "./AdminLogin.css";
 
@@ -102,6 +103,8 @@ function AdminLogin() {
 
   return (
     <div className="admin-login-page">
+
+      <BackButton fallbackPath="/" variant="admin" />
 
       <div className="admin-login-left">
 

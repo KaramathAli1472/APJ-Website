@@ -149,13 +149,7 @@ function AdminRegistrations() {
           item.mobile || ""
         )
           .toLowerCase()
-          .includes(searchValue) ||
-        String(
-          item.transactionNumber || ""
-        )
-          .toLowerCase()
           .includes(searchValue);
-
       const matchesStatus =
         statusFilter === "All" ||
         item.approvalStatus === statusFilter;
@@ -192,58 +186,6 @@ function AdminRegistrations() {
     (item) =>
       item.approvalStatus === "Rejected"
   ).length;
-
-  const verifiedPayments = registrations.filter(
-    (item) =>
-      item.paymentStatus === "Verified"
-  ).length;
-
-  // ============================================================
-  // PAYMENT STATUS
-  // ============================================================
-
-  const updatePaymentStatus = async (
-    registration,
-    status
-  ) => {
-    try {
-      setActionLoading(true);
-
-      await updateDoc(
-        doc(
-          db,
-          "registrations",
-          registration.id
-        ),
-        {
-          paymentStatus: status,
-          updatedAt: new Date(),
-        }
-      );
-
-      setSelectedRegistration(
-        (previous) =>
-          previous
-            ? {
-                ...previous,
-                paymentStatus: status,
-              }
-            : previous
-      );
-    } catch (error) {
-      console.error(
-        "Payment status update error:",
-        error
-      );
-
-      alert(
-        error?.message ||
-          "Unable to update payment status."
-      );
-    } finally {
-      setActionLoading(false);
-    }
-  };
 
   // ============================================================
   // APPROVAL STATUS
@@ -702,8 +644,7 @@ function AdminRegistrations() {
           </h1>
 
           <p>
-            Review student registrations, verify
-            payments and approve applications.
+            Review and approve student registrations.
           </p>
 
         </div>
@@ -782,28 +723,6 @@ function AdminRegistrations() {
 
         </div>
 
-        <div className="registration-stat-card">
-
-          <div className="registration-stat-icon payment">
-            ₹
-          </div>
-
-          <div>
-
-            <span>
-              Payment Verified
-            </span>
-
-            <strong>
-              {loading
-                ? "..."
-                : verifiedPayments}
-            </strong>
-
-          </div>
-
-        </div>
-
       </div>
 
       {/* ======================================================
@@ -830,7 +749,7 @@ function AdminRegistrations() {
                   event.target.value
                 )
               }
-              placeholder="Search ID, student, school, mobile or UTR..."
+              placeholder="Search ID, student, school or mobile..."
             />
 
           </div>
@@ -938,10 +857,6 @@ function AdminRegistrations() {
 
                   <th>
                     Class
-                  </th>
-
-                  <th>
-                    Payment
                   </th>
 
                   <th>
@@ -1053,27 +968,6 @@ function AdminRegistrations() {
                       <td>
                         {registration.className ||
                           "—"}
-                      </td>
-
-                      <td>
-
-                        <span
-                          className={`status-badge payment-${String(
-                            registration.paymentStatus ||
-                              "Pending"
-                          )
-                            .toLowerCase()
-                            .replace(
-                              /\s+/g,
-                              "-"
-                            )}`}
-                        >
-
-                          {registration.paymentStatus ||
-                            "Pending"}
-
-                        </span>
-
                       </td>
 
                       <td>
@@ -1431,114 +1325,6 @@ function AdminRegistrations() {
               </div>
 
               {/* ==================================================
-                  PAYMENT
-              ================================================== */}
-
-              <div className="detail-section">
-
-                <h4>
-                  Payment Information
-                </h4>
-
-                <div className="payment-review-box">
-
-                  <div>
-
-                    <span>
-                      Registration Fee
-                    </span>
-
-                    <strong>
-                      ₹
-                      {selectedRegistration.registrationFee ||
-                        200}
-                    </strong>
-
-                  </div>
-
-                  <div>
-
-                    <span>
-                      Transaction / UTR
-                    </span>
-
-                    <strong>
-                      {selectedRegistration.transactionNumber ||
-                        "—"}
-                    </strong>
-
-                  </div>
-
-                  <div>
-
-                    <span>
-                      Payment Status
-                    </span>
-
-                    <strong>
-                      {selectedRegistration.paymentStatus ||
-                        "Pending"}
-                    </strong>
-
-                  </div>
-
-                </div>
-
-                <div className="payment-actions">
-
-                  <button
-                    type="button"
-                    className="verify-payment-button"
-                    disabled={
-                      actionLoading
-                    }
-                    onClick={() =>
-                      updatePaymentStatus(
-                        selectedRegistration,
-                        "Verified"
-                      )
-                    }
-                  >
-                    ✓ Verify Payment
-                  </button>
-
-                  <button
-                    type="button"
-                    className="reject-payment-button"
-                    disabled={
-                      actionLoading
-                    }
-                    onClick={() =>
-                      updatePaymentStatus(
-                        selectedRegistration,
-                        "Rejected"
-                      )
-                    }
-                  >
-                    ✕ Reject Payment
-                  </button>
-
-                  <button
-                    type="button"
-                    className="pending-payment-button"
-                    disabled={
-                      actionLoading
-                    }
-                    onClick={() =>
-                      updatePaymentStatus(
-                        selectedRegistration,
-                        "Pending"
-                      )
-                    }
-                  >
-                    Set Pending
-                  </button>
-
-                </div>
-
-              </div>
-
-              {/* ==================================================
                   APPROVAL
               ================================================== */}
 
@@ -1584,9 +1370,7 @@ function AdminRegistrations() {
                     type="button"
                     className="approve-button"
                     disabled={
-                      actionLoading ||
-                      selectedRegistration.paymentStatus !==
-                        "Verified"
+                      actionLoading
                     }
                     onClick={() =>
                       updateApprovalStatus(
@@ -1615,18 +1399,6 @@ function AdminRegistrations() {
                   </button>
 
                 </div>
-
-                {selectedRegistration.paymentStatus !==
-                  "Verified" && (
-
-                  <p className="approval-note">
-
-                    Payment must be verified before
-                    the registration can be approved.
-
-                  </p>
-
-                )}
 
                 {/* ==================================================
                     ID CARD SECTION
@@ -1661,8 +1433,7 @@ function AdminRegistrations() {
 
                       <p>
                         ID Card can only be generated after the
-                        registration has been approved and payment
-                        has been verified.
+                        registration has been approved.
                       </p>
 
                     </div>
@@ -1681,9 +1452,7 @@ function AdminRegistrations() {
                       </button>
 
                     ) : selectedRegistration.approvalStatus ===
-                        "Approved" &&
-                      selectedRegistration.paymentStatus ===
-                        "Verified" ? (
+                        "Approved" ? (
 
                       <button
                         type="button"

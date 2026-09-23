@@ -51,6 +51,9 @@ function Footer() {
             <Link to="/notices">Notices</Link>
             <Link to="/faq">FAQ</Link>
             <Link to="/contact">Contact</Link>
+            <Link to="/privacy-policy">
+              Privacy Policy
+            </Link>
           </div>
 
           {/* Contact */}
