@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://apj-edu.web.app/sitemap.xml

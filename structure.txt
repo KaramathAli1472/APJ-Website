@@ -22519,9 +22519,6 @@ D:.
     |   +---auth
     |   |       authService.js
     |   |       
-    |   +---cloudinary
-    |   |       cloudinaryConfig.js
-    |   |       
     |   +---firebase
     |   |       firebaseConfig.js
     |   |       

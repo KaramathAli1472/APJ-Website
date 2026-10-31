@@ -827,7 +827,7 @@ return (
           <div className="notice-field">
 
             <label>
-              Notice Description
+              Scrolling Notice / Description
             </label>
 
             <textarea
@@ -838,7 +838,7 @@ return (
               onChange={
                 handleChange
               }
-              placeholder="Enter complete notice details..."
+              placeholder="Yahan scrolling notice ka text likhein..."
               rows="7"
               required
             />

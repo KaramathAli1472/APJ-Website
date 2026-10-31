@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 import {
-addDoc,
 collection,
 deleteDoc,
 doc,
@@ -15,7 +14,6 @@ updateDoc,
 import "./AdminGallery.css";
 
 import { db } from "../../services/firestore/firestoreService";
-import cloudinaryConfig from "../../services/cloudinary/cloudinaryConfig";
 
 function AdminGallery() {
 const [search, setSearch] = useState("");
@@ -33,7 +31,6 @@ useState(null);
 const [gallery, setGallery] = useState([]);
 const [loading, setLoading] = useState(false);
 const [saving, setSaving] = useState(false);
-const [uploading, setUploading] = useState(false);
 const [error, setError] = useState("");
 
 const [formData, setFormData] = useState({
@@ -172,118 +169,11 @@ imageUrl: "",
 setEditingId(null);
 setShowForm(false);
 setSaving(false);
-setUploading(false);
 
 };
 
 // =========================
-// OPEN ADD
-// =========================
-
-const openAddForm = () => {
-setEditingId(null);
-
-setFormData({
-  title: "",
-  category: "Events",
-  description: "",
-  imageUrl: "",
-});
-
-setShowForm(true);
-
-};
-
-// =========================
-// CLOUDINARY UPLOAD
-// =========================
-
-const handleImageUpload = async (event) => {
-const file = event.target.files?.[0];
-
-if (!file) {
-  return;
-}
-
-if (!file.type.startsWith("image/")) {
-  window.alert(
-    "Please select a valid image file."
-  );
-
-  event.target.value = "";
-  return;
-}
-
-const maxSize =
-  10 * 1024 * 1024;
-
-if (file.size > maxSize) {
-  window.alert(
-    "Image size must be less than 10 MB."
-  );
-
-  event.target.value = "";
-  return;
-}
-
-try {
-  setUploading(true);
-  setError("");
-
-  const uploadData = new FormData();
-
-  uploadData.append("file", file);
-
-  uploadData.append(
-    "upload_preset",
-    cloudinaryConfig.uploadPreset
-  );
-
-  const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
-    {
-      method: "POST",
-      body: uploadData,
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error(
-      "Cloudinary Error:",
-      data
-    );
-
-    throw new Error(
-      data?.error?.message ||
-        "Cloudinary upload failed."
-    );
-  }
-
-  setFormData((current) => ({
-    ...current,
-    imageUrl: data.secure_url,
-  }));
-} catch (uploadError) {
-  console.error(
-    "Image Upload Error:",
-    uploadError
-  );
-
-  window.alert(
-    uploadError.message ||
-      "Unable to upload image."
-  );
-} finally {
-  setUploading(false);
-  event.target.value = "";
-}
-
-};
-
-// =========================
-// ADD / UPDATE
+// EDIT
 // =========================
 
 const handleSubmit = async (event) => {
@@ -292,13 +182,6 @@ event.preventDefault();
 if (!formData.title.trim()) {
   window.alert(
     "Please enter photo title."
-  );
-  return;
-}
-
-if (!formData.imageUrl.trim()) {
-  window.alert(
-    "Please upload an image first."
   );
   return;
 }
@@ -315,31 +198,16 @@ try {
     imageUrl: formData.imageUrl.trim(),
   };
 
-  // UPDATE
-  if (editingId) {
-    const galleryRef = doc(
-      db,
-      "gallery",
-      editingId
-    );
+  const galleryRef = doc(
+    db,
+    "gallery",
+    editingId
+  );
 
-    await updateDoc(galleryRef, {
-      ...galleryData,
-      updatedAt: serverTimestamp(),
-    });
-  }
-
-  // ADD
-  else {
-    await addDoc(
-      collection(db, "gallery"),
-      {
-        ...galleryData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      }
-    );
-  }
+  await updateDoc(galleryRef, {
+    ...galleryData,
+    updatedAt: serverTimestamp(),
+  });
 
   resetForm();
 } catch (firebaseError) {
@@ -447,14 +315,6 @@ return (
       </p>
     </div>
 
-    <button
-      type="button"
-      className="gallery-add-button"
-      onClick={openAddForm}
-    >
-      <span>+</span>
-      Add Photo
-    </button>
   </header>
 
   {/* =========================
@@ -638,13 +498,17 @@ return (
                     openPreview(item)
                   }
                 >
-                  <img
-                    src={item.imageUrl}
-                    alt={
-                      item.title ||
-                      "Gallery photo"
-                    }
-                  />
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={
+                        item.title ||
+                        "Gallery photo"
+                      }
+                    />
+                  ) : (
+                    <span>No image available</span>
+                  )}
 
                   <div className="gallery-image-overlay">
                     <span>
@@ -749,9 +613,7 @@ return (
             </span>
 
             <h2>
-              {editingId
-                ? "Edit Photo"
-                : "Add Photo"}
+              Edit Photo
             </h2>
           </div>
 
@@ -820,53 +682,7 @@ return (
 
           </div>
 
-          <div className="gallery-field">
-
-            <label>
-              Upload Image
-            </label>
-
-            <input
-              type="file"
-              accept="image/*"
-              onChange={
-                handleImageUpload
-              }
-              disabled={uploading}
-            />
-
-            {uploading && (
-              <small>
-                Uploading image to
-                Cloudinary...
-              </small>
-            )}
-
-            {formData.imageUrl && (
-              <div
-                style={{
-                  marginTop: "12px",
-                }}
-              >
-                <img
-                  src={
-                    formData.imageUrl
-                  }
-                  alt="Preview"
-                  style={{
-                    width: "100%",
-                    maxHeight: "220px",
-                    objectFit: "cover",
-                    borderRadius: "12px",
-                    display: "block",
-                  }}
-                />
-              </div>
-            )}
-
-          </div>
-
-          <div className="gallery-field">
+            <div className="gallery-field">
 
             <label>
               Description
@@ -890,9 +706,7 @@ return (
               type="button"
               className="cancel"
               onClick={resetForm}
-              disabled={
-                saving || uploading
-              }
+              disabled={saving}
             >
               Cancel
             </button>
@@ -900,15 +714,9 @@ return (
             <button
               type="submit"
               className="save"
-              disabled={
-                saving || uploading
-              }
+              disabled={saving}
             >
-              {saving
-                ? "Saving..."
-                : editingId
-                ? "Update Photo"
-                : "Add Photo"}
+              {saving ? "Saving..." : "Update Photo"}
             </button>
 
           </div>
@@ -944,15 +752,17 @@ return (
             ×
           </button>
 
-          <img
-            src={
-              previewImage.imageUrl
-            }
-            alt={
-              previewImage.title ||
-              "Gallery photo"
-            }
-          />
+          {previewImage.imageUrl ? (
+            <img
+              src={previewImage.imageUrl}
+              alt={
+                previewImage.title ||
+                "Gallery photo"
+              }
+            />
+          ) : (
+            <div>No image available</div>
+          )}
 
           <div className="gallery-preview-info">
 

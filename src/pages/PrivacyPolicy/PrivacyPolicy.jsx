@@ -67,10 +67,9 @@ function PrivacyPolicy() {
             <h2>4. Service Providers</h2>
             <p>
               APJ EDU may use trusted technology providers, such as Firebase
-              for authentication and database services and Cloudinary for
-              approved media storage. These providers process information only
-              as needed to provide their services and have their own privacy
-              and security practices.
+              for authentication and database services. These providers process
+              information only as needed to provide their services and have
+              their own privacy and security practices.
             </p>
           </section>
 

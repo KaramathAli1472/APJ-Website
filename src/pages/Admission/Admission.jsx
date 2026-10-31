@@ -7,7 +7,6 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../../services/firestore/firestoreService";
-import cloudinaryConfig from "../../services/cloudinary/cloudinaryConfig";
 import {
   createStudentAccount,
   logoutAdmin,
@@ -29,10 +28,8 @@ function Admission() {
     mobile: "",
     whatsapp: "",
     address: "",
-    studentPhoto: null,
   });
 
-  const [photoPreview, setPhotoPreview] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -50,48 +47,6 @@ function Admission() {
     setErrors((previous) => ({
       ...previous,
       [name]: "",
-    }));
-
-    setSubmitted(false);
-    setSubmitError("");
-  };
-
-  const handlePhotoChange = (event) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      setErrors((previous) => ({
-        ...previous,
-        studentPhoto: "Please select a valid image.",
-      }));
-
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setErrors((previous) => ({
-        ...previous,
-        studentPhoto:
-          "Student photo must be less than 5 MB.",
-      }));
-
-      return;
-    }
-
-    setFormData((previous) => ({
-      ...previous,
-      studentPhoto: file,
-    }));
-
-    setPhotoPreview(URL.createObjectURL(file));
-
-    setErrors((previous) => ({
-      ...previous,
-      studentPhoto: "",
     }));
 
     setSubmitted(false);
@@ -166,53 +121,9 @@ function Admission() {
         "Address is required.";
     }
 
-    if (!formData.studentPhoto) {
-      newErrors.studentPhoto =
-        "Student photo is required.";
-    }
-
     setErrors(newErrors);
 
     return Object.keys(newErrors).length === 0;
-  };
-
-  const uploadStudentPhoto = async (file) => {
-    if (
-      !cloudinaryConfig.cloudName ||
-      !cloudinaryConfig.uploadPreset
-    ) {
-      throw new Error(
-        "Cloudinary configuration is missing."
-      );
-    }
-
-    const uploadData = new FormData();
-
-    uploadData.append("file", file);
-
-    uploadData.append(
-      "upload_preset",
-      cloudinaryConfig.uploadPreset
-    );
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
-      {
-        method: "POST",
-        body: uploadData,
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok || !data.secure_url) {
-      throw new Error(
-        data?.error?.message ||
-          "Student photo upload failed."
-      );
-    }
-
-    return data.secure_url;
   };
 
   /*
@@ -223,15 +134,15 @@ function Admission() {
    * student's Registration ID.
    *
    * Example:
-   * APJ-2026-DZW8
+   * apj-2026-dzw8
    */
   const createRegistrationId = (firestoreDocumentId) => {
     const currentYear = new Date().getFullYear();
     const shortDocumentId = firestoreDocumentId
       .slice(0, 4)
-      .toUpperCase();
+      .toLowerCase();
 
-    return `APJ-${currentYear}-${shortDocumentId}`;
+    return `apj-${currentYear}-${shortDocumentId}`;
   };
 
   const resetForm = () => {
@@ -248,10 +159,8 @@ function Admission() {
       mobile: "",
       whatsapp: "",
       address: "",
-      studentPhoto: null,
     });
 
-    setPhotoPreview("");
     setErrors({});
   };
 
@@ -273,16 +182,6 @@ function Admission() {
     try {
       /*
        * STEP 1
-       * Upload student photo to Cloudinary.
-       */
-
-      const studentPhotoUrl =
-        await uploadStudentPhoto(
-          formData.studentPhoto
-        );
-
-      /*
-       * STEP 2
        * Create a new Firestore document reference.
        *
        * Firestore generates a unique document ID
@@ -294,7 +193,7 @@ function Admission() {
       );
 
       /*
-       * STEP 3
+       * STEP 2
        * Create the student's unique Registration ID
        * using the unique Firestore document ID.
        */
@@ -311,7 +210,7 @@ function Admission() {
         );
 
       /*
-       * STEP 4
+       * STEP 3
        * Prepare registration data.
        */
 
@@ -359,7 +258,7 @@ function Admission() {
           formData.address.trim(),
 
         studentPhotoUrl:
-          studentPhotoUrl,
+          "",
 
         /*
          * Payment is not completed at the initial
@@ -380,14 +279,17 @@ function Admission() {
          */
 
         approvalStatus:
-          "Pending",
+          "Approved",
 
         /*
-         * ID card will NOT be generated at submission.
+         * ID card is generated immediately at registration.
          */
 
         idCardStatus:
-          "Not Generated",
+          "Generated",
+
+        idCardGeneratedAt:
+          serverTimestamp(),
 
         idCardUrl:
           "",
@@ -568,9 +470,8 @@ function Admission() {
                     }}
                   >
                     Please save this Registration ID.
-                    You will need it to check your
-                    registration status and download
-                    your Student ID Card after approval.
+                    You can use it to log in and access
+                    your Student ID Card anytime.
                   </div>
 
                   <a
@@ -594,9 +495,8 @@ function Admission() {
                   marginTop: "12px",
                 }}
               >
-                Your Student ID Card will be generated
-                after your registration details are
-                verified and approved by the administration.
+                Your Student ID Card has been generated
+                successfully and is ready for use.
               </span>
 
             </div>
@@ -1075,83 +975,6 @@ function Admission() {
                 {errors.address && (
                   <small>
                     {errors.address}
-                  </small>
-                )}
-
-              </div>
-
-            </div>
-
-            {/* 04 */}
-
-            <div className="form-section-title">
-
-              <span>
-                04
-              </span>
-
-              <div>
-
-                <h3>
-                  Student Photo
-                </h3>
-
-                <p>
-                  Upload a clear recent photograph.
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="photo-upload-area">
-
-              <div className="photo-preview">
-
-                {photoPreview ? (
-                  <img
-                    src={photoPreview}
-                    alt="Student preview"
-                  />
-                ) : (
-                  <div className="photo-placeholder">
-
-                    <span>
-                      📷
-                    </span>
-
-                    <p>
-                      Student Photo
-                    </p>
-
-                  </div>
-                )}
-
-              </div>
-
-              <div className="photo-upload-content">
-
-                <label
-                  htmlFor="studentPhoto"
-                  className="upload-button"
-                >
-                  Choose Photo
-                </label>
-
-                <input
-                  id="studentPhoto"
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                />
-
-                <p>
-                  JPG, JPEG or PNG • Maximum 5 MB
-                </p>
-
-                {errors.studentPhoto && (
-                  <small>
-                    {errors.studentPhoto}
                   </small>
                 )}
 

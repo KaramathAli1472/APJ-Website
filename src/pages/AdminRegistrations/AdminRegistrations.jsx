@@ -305,16 +305,6 @@ function AdminRegistrations() {
   const generateIdCard = async (
     registration
   ) => {
-    if (
-      registration.approvalStatus !==
-      "Approved"
-    ) {
-      alert(
-        "Registration must be approved before generating the ID card."
-      );
-      return;
-    }
-
     try {
       setActionLoading(true);
 
@@ -1432,8 +1422,8 @@ function AdminRegistrations() {
                       </strong>
 
                       <p>
-                        ID Card can only be generated after the
-                        registration has been approved.
+                        ID Card is ready to be generated for
+                        this registration.
                       </p>
 
                     </div>
@@ -1451,8 +1441,7 @@ function AdminRegistrations() {
                         🎫 View ID Card
                       </button>
 
-                    ) : selectedRegistration.approvalStatus ===
-                        "Approved" ? (
+                    ) : (
 
                       <button
                         type="button"
@@ -1465,16 +1454,6 @@ function AdminRegistrations() {
                         {actionLoading
                           ? "Generating..."
                           : "🎫 Generate ID Card"}
-                      </button>
-
-                    ) : (
-
-                      <button
-                        type="button"
-                        className="admin-registration-disabled-button"
-                        disabled
-                      >
-                        🔒 Generate ID Card
                       </button>
 
                     )}

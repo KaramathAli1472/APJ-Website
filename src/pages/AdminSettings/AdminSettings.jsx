@@ -783,10 +783,9 @@ return (
         </strong>
 
         <p>
-          Do not put Firebase passwords,
-          Cloudinary API secrets or other
-          private credentials inside your
-          React source code.
+          Do not put Firebase passwords or
+          other private credentials inside
+          your React source code.
         </p>
 
       </div>

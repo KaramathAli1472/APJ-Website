@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import apjStudents from "../../assets/apj-students.jpg";
 import "./Home.css";
 
 function Home() {
@@ -8,73 +9,61 @@ function Home() {
     <div className="home-page">
 
       {/* Hero Section */}
-      <section className="hero-section">
+      <section
+        className="hero-section"
+        style={{
+          backgroundImage:
+            'linear-gradient(90deg, rgba(7, 31, 58, 0.82) 0%, rgba(7, 31, 58, 0.62) 48%, rgba(7, 31, 58, 0.18) 100%), url("' +
+            apjStudents +
+            '")',
+          backgroundSize: "cover",
+          backgroundPosition: "center 38%",
+        }}
+      >
         <div className="hero-overlay"></div>
 
         <div className="hero-container">
           <div className="hero-content">
-
-            <span className="hero-tag">
-              APJ Abdul Kalam Welfare Society
-            </span>
-
             <h1>
-              Empowering Students
-              <span> Building Futures</span>
+              Discover Your Future
+              <span>With Us</span>
             </h1>
 
             <p>
-              Welcome to APJ EDU — a platform dedicated to education,
-              student development, knowledge and a brighter future.
+              Education, knowledge and opportunity for every student.
             </p>
 
             <div className="hero-buttons">
-              <Link to="/admission" className="btn btn-primary">
-                Apply for Registration
-              </Link>
-
               <Link to="/syllabus" className="btn btn-outline">
-                Explore Syllabus
+                Read More
               </Link>
-            </div>
-
-            <div className="hero-stats">
-              <div>
-                <strong>4–12</strong>
-                <span>Classes</span>
-              </div>
-
-              <div>
-                <strong>7+</strong>
-                <span>Academic Levels</span>
-              </div>
-
-              <div>
-                <strong>100%</strong>
-                <span>Student Focus</span>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="hero-card-wrapper">
-            <div className="hero-card">
-              <div className="hero-card-icon">🎓</div>
-
-              <h3>Learn</h3>
-              <p>Grow</p>
-              <span>Achieve</span>
-
-              <div className="hero-card-line"></div>
-
-              <small>
-                Education is the foundation of a better tomorrow.
-              </small>
             </div>
           </div>
         </div>
       </section>
 
+      <section className="home-feature-strip" aria-label="Education highlights">
+        <div className="home-feature-card">
+          <span className="feature-icon">🎓</span>
+          <h3>Strong Foundation</h3>
+          <p>Build knowledge and confidence from classes 4 to 12.</p>
+        </div>
+        <div className="home-feature-card">
+          <span className="feature-icon">👥</span>
+          <h3>Student Community</h3>
+          <p>Learn, grow and succeed in a supportive environment.</p>
+        </div>
+        <div className="home-feature-card">
+          <span className="feature-icon">📚</span>
+          <h3>Best Curriculum</h3>
+          <p>Clear resources, subjects and syllabus guidance.</p>
+        </div>
+        <div className="home-feature-card">
+          <span className="feature-icon">📅</span>
+          <h3>Flexible Learning</h3>
+          <p>Access academic information whenever students need it.</p>
+        </div>
+      </section>
 
       {/* Welcome Section */}
       <section className="welcome-section">
